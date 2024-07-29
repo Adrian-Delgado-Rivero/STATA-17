@@ -1,0 +1,292 @@
+*8. ECONOMETRIA DE SERIES DE TIEMPO	
+
+{
+	*GENERAR
+	*D1(Y)	Velocidad
+	gen dy=Y-Y[_n-1]
+	gen dx2=X2-X2[_n-1]
+
+
+	*D2(Y) aceleracion
+	gen d2y=dy-dy[_n-1]
+	gen d2x2=dx2-dx2[_n-1]
+
+	
+	* UNIVARIADO ////////////
+	
+	{
+		*Ejemplo 1
+set fredkey 333665447d22e5a4154f7085e78929b5
+import fred IMP3350, clear
+summarize
+rename IMP3350 exports_USA
+describe
+browse
+generate montly=mofd(daten)
+format montly  %tm
+*  Especificar estructura de la serie de tiempo
+tsset montly
+list daten montly exports_USA if  tin(1992m1,1992m6)
+list montly exports_USA L.exports_USA  L2.exports_USA F.exports_USA D.exports_USA if tin(1992m1,1992m6), noobs
+tsline exports_USA, title("Exportaciones mensuales de mercancías a EEUU") subtitle("1992m1-2024m2")  ytitle("Millones de $us")    xtitle("periodo") note(Fuente: "FRED, U.S. Census Bureau; U.S. Bureau of Economic Analysis")
+tsline    D.exports_USA, title("Exportaciones mensuales de mercancías a EEUU (primera diferencia)") subtitle("1992m1-2024m2")  ytitle("    ")    xtitle("    ") note(Fuente: "U.S. Census Bureau; U.S. Bureau of Economic Analysis")
+
+****************************************************************************************************************
+*Ejemplo 2
+****************************************************************************************************************
+import fred ITNETUSERP2BOL, daterange(1995-01-01 2021-01-01) clear
+sum
+ren ITNETUSERP2BOL usuarios
+generate year=yofd(daten)
+label var year "año"
+
+tsset year,yearly
+
+list if tin(1995,2000)
+
+*************************************************************
+*Box Jenkins*
+*************************************************************
+
+**************************************************************
+*1. Identificación
+
+tsline usuarios, name(level,replace) title("% de internautas") subtitle("1995-2021")  ytitle("porcentaje") xtitle("periodo") note(Fuente: "FRED, World Bank")
+tsline D.usuarios, name(difference,replace) title("% de internautas (primera diferencia)") subtitle("1995-2021")  ytitle("porcentaje") xtitle("periodo") note(Fuente: "FRED, World Bank")
+graph combine level difference,rows(2) 
+
+ac D.usuarios,lags(10) ytitle(" ")  name(ac_internautas,replace)title("Función de Autocorrelación de internautas") ylabels(#4,angle(0))
+pac D.usuarios,lags(10) ytitle(" ") name(pac_internautas,replace)title("Función de Autocorrelación Parcial de internautas") ylabels(#4,angle(0))
+
+dfuller usuarios
+dfuller D.usuarios
+	
+graph combine ac_internautas pac_internautas,rows(2)
+**************************************************************
+*2. Estimación
+
+arima D.usuarios, arima(1,0,1) nolog vsquish
+arima D.usuarios, arima(1,0,0) nolog vsquish
+arima D.usuarios, arima(2,0,0) nolog vsquish
+*tarea el resto
+**************************************************************
+*3. Validación
+
+*test de portmanteau
+*H0: el proceso el ruido blanco
+*ARIMA(1,1) 
+quietly arima D.usuarios, arima(1,0,1)
+predict resid11, resid
+wntestq resid11
+wntestb resid11
+estat ic
+
+*la media del error debe ser cero
+summarize resid11
+scalar media_error11= r(mean)
+tsline resid11, yline(`r(mean)')
+
+*ARIMA(1,0) 
+quietly arima D.usuarios, arima(1,0,0)
+predict resid12, resid
+wntestq resid12
+wntestb resid12
+
+estat ic
+
+*ARIMA(2,0) tarea para la casa
+
+**************************************************************
+*Predicción 
+tsappend, add(5)
+arima usuarios, arima(1,1,1) //Modelo seleccionado
+predict usuariosf, y dynamic(y(2022))
+ 
+tsline usuariosf usuarios
+
+
+***************************************************************
+* Instalar acceso a datos el Banco mundial en Stata
+
+****************************************************************************************************************
+*Ejemplo 3
+****************************************************************************************************************
+ssc install wbopendata // este comando instala el modulo en stata
+*db wbopendata  // Para ver el menu
+wbopendata, language(es - Spanish) country(BOL;) topics() indicator(NY.GDP.PCAP.KD - GDP per capita(constant 2010 US$)) clear long
+sum
+ren ny_gdp_pcap_kd pibpc
+tsset year,yearly
+list year pib if tin(1960,1970) 
+tsline pib, name(level,replace) title("PIB percápita en $us constantes de 2010") subtitle("1960-2022")  ytitle("$us") xtitle("periodo") note(Fuente: "World Bank")
+tsline D.pib, name(difference,replace) title("PIB percápita en $us constantes de 2010 (1ra diferencia") subtitle("1960-2022")  ytitle("$us") xtitle("periodo") note(Fuente: "World Bank")
+graph combine level difference,rows(2) 
+
+
+	}
+	
+	* UNIVARIADO HETEROSEDASTICO ////////////
+	
+	{
+		
+		*Sesión 3
+* Importaciones mensuales de mercancias desde Bolivia a EEUU
+*Abrimos la base de datos
+set fredkey 333665447d22e5a4154f7085e78929b5
+import fred IMP3350, clear
+summarize // resumen estadístico
+rename IMP3350 exports //cambio de nombre
+describe 
+browse
+*  Especificar estructura de la serie de tiempo*
+generate montly=mofd(daten)
+format montly  %tm
+tsset montly
+list daten montly exports if  tin(1992m1,1992m6)
+list montly exports L.exports  L2.exports F.exports D.exports if tin(1992m1,1992m6), noobs
+*Gráficos temporales en niveles y primeras diferencias
+tsline exports, name(level,replace)  title("Exportaciones mensuales de mercancías a EEUU") subtitle("1992m1-2024m2")  ytitle("Millones de $us")    xtitle("periodo") note(Fuente: "FRED, U.S. Census Bureau; U.S. Bureau of Economic Analysis")
+tsline    D.exports, name(difference,replace) title("Exportaciones mensuales de mercancías a EEUU (primera diferencia)") subtitle("1992m1-2024m2")  ytitle("    ")    xtitle("    ") note(Fuente: "U.S. Census Bureau; U.S. Bureau of Economic Analysis")
+graph combine level difference,rows(2) 
+********************************************************************************
+*1 Identificación
+* Gráficos de la autocorrelación y autocorrelación parcial
+ac D.exports,lags(10) ytitle(" ")  name(ac_exports,replace)title("Función de Autocorrelación de Exportaciones a EEUU") ylabels(#4,angle(0))
+pac D.exports,lags(10) ytitle(" ") name(pac_exports,replace)title("Función de Autocorrelación Parcial de Exportaciones a EEUU") ylabels(#4,angle(0))
+graph combine ac_exports pac_exports,rows(2)
+*2 Estimación
+arch D.exports,ar(1/2) ma(1) arch(1) garch(1)  nolog vsquish
+arch D.exports,ar(1/2) ma(1/2) arch(1) garch(1)  nolog vsquish
+arch D.exports,ar(1)  arch(1) garch(1)  nolog vsquish
+* 3 Validación
+*test de portmanteau
+*H0: el proceso el ruido blanco
+
+*ARMA(2,1) arch(1) garch(1)
+quietly arch D.exports,ar(1/2) ma(1) arch(1) garch(1)
+predict resid11, resid
+wntestq resid11
+wntestb resid11
+estat ic
+summarize resid11
+scalar media_error11= r(mean)
+tsline resid11, yline(`r(mean)') //la media del error debe ser cero
+
+*ARMA(2,2) arch(1) garch(1)
+quietly arch D.exports,ar(1/2) ma(1/2) arch(1) garch(1)
+predict resid12, resid
+wntestq resid12
+wntestb resid12
+estat ic
+summarize resid12
+scalar media_error12= r(mean)
+tsline resid12, yline(`r(mean)')
+
+*ARMA(1,0) arch(1) garch(1)
+quietly arch D.exports,ar(1) arch(1) garch(1)
+predict resid13, resid
+wntestq resid13
+wntestb resid13
+estat ic
+summarize resid13
+scalar media_error13= r(mean)
+tsline resid13, yline(`r(mean)')
+
+*Predicción 
+tsappend, add(10)
+arch D.exports,ar(1/2) ma(1/2) arch(1) garch(1) //Modelo seleccionado
+predict exportsf, y dynamic(m(2024.m3))
+ 
+tsline exportsf exports
+
+
+	}
+	
+	* MULTIVARIADO ////////////
+
+	{
+		*****************************************************************************************
+*VAR*************************************************************************************
+*Trabajaremos con la balanza de pagos y el PIB de nuestro país
+import fred BOLBCAGDPBP6 PCAGDPBOA646NWDB PLXCPPBOA670NRUG, clear
+
+rename BOLBCAGDPBP6 BDP
+rename PCAGDPBOA646NWDB GDP
+rename PLXCPPBOA670NRUG Prices
+describe
+generate year=yofd(daten)
+tsset year 
+
+tsline BDP,name(bdp_levels,replace) ytitle("Levels")title("Balanza de pagos") ylabels(#3,angle(0)) xlabels(#3) xtitle("")
+tsline D.BDP,name(bdp_diff,replace) ytitle("First difference")ylabels(#3,angle(0)) xlabels(#3) xtitle("")
+tsline GDP,name(pib_levels,replace) ytitle("Levels") title("GDP") ylabels(#3,angle(0)) xlabels(#3) xtitle("") 
+tsline D.GDP,name(pib_diff,replace) ytitle("First difference")ylabels(#3,angle(0)) xlabels(#3) xtitle("") 
+graph combine bdp_levels pib_levels bdp_diff pib_diff,rows(2)  note(Source: Federal Reserve databank) 
+
+tsline Prices,name(Prices_levels,replace) ytitle("Levels")title("Price Level of Exports") ylabels(#3,angle(0)) xlabels(#3) xtitle("")
+tsline D.Prices,name(Prices_diff,replace) ytitle("First difference")ylabels(#3,angle(0)) xlabels(#3) xtitle("")
+graph combine bdp_levels pib_levels Prices_levels bdp_diff pib_diff Prices_diff,rows(3)  note(Source: Federal Reserve databank) 
+
+var D.BDP D.GDP if tin(1980,2019), exog(D.Prices) vsquish 
+estimates store eq_var
+
+irf create order1, step(5) set(myirf1,replace)
+irf graph oirf,impulse(D.BDP) response(D.BDP) name(i_bdp__r_bdp,replace)
+irf graph oirf,impulse(D.BDP) response(D.GDP) name(i_bdp__r_pib,replace)
+irf graph oirf,impulse(D.GDP) response(D.GDP) name(i_pib__r_pib,replace)
+irf graph oirf,impulse(D.GDP) response(D.BDP) name(i_pib__r_bdp,replace)
+
+graph combine i_bdp__r_pib i_bdp__r_bdp i_pib__r_pib i_pib__r_bdp, ///
+     title("Impulse-response functions")
+		
+	}
+	
+	*PANEL ////////////
+	
+	{
+
+		//renombrar variables
+		ren var1 i
+		ren var2 t
+		ren var3 y
+		ren var4 x2
+		ren var5 x3
+
+		//Declarar que son datos en panel
+		xtset i t
+
+		//i son 4 empresas
+		//t son 20 años de 1935 a 1954
+
+		// Regresión Pooled o datos agrupados////////////
+		reg y x2 x3
+
+		//Modelo de efectos aleatorios re/////////////////
+		xtreg y x2 x3, re
+
+		//Prueba de BREUSCH Y PAGAN
+		//Ho.: "modelo pooled en vez de efectos aleaorios"
+		//después de correr pooled y re
+		xttest0
+
+		//Modelo de efectos fijos /////////////////////
+		xtreg y x2 x3, fe
+
+		//Si ya estimamos pooled, luego efectos fijos
+		//Ho.: "modelo pooled en vez de efectos fijos"
+
+		//Entonces, como es preferible efectos fijos ya/efectos aleatorios al modelo pooled
+		//Realizar la prueba de Hausman
+		//primero correr efectos fijos, luego guardar
+		//segundo correr efectos aleatorios, guardar
+		estimates store FIXED
+
+		xtreg y x2 x3, re
+		estimates store RANDOM
+
+		//Se aplica el Test de Hausman
+		//Ho.: "Es preferibre re a fe"
+		hausman FIXED RANDOM
+
+	}
+}
