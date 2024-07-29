@@ -1,0 +1,40 @@
+*6. ESTADISTICA INFERENCIAL NO PARAMETRICO
+
+{
+	* MEDIANA
+
+	{	
+*	median yprilab, by(area)
+*	ranksum yprilab, by(area)
+	}
+	
+	* VARIANZA
+	
+	{
+	 ksmirnov escolaridad = 12
+	 ksmirnov escolaridad, by(area)
+	}
+	
+	* NORMALIDAD
+	
+	{
+		sktest price  // si es menor a 0.05 entonces no sigue una distribucion normal
+		sktest price if peso==1
+		sktest price if peso==0
+		swilk price
+		
+		bysort peso: swilk price
+		histogram price, by(peso) normal
+		
+		kdensity price, normal
+		ksmirnov price, by(peso)
+
+		
+		by caeb_op, sort :mvtest normality yprilab /// MULTIVARIADA
+	}
+	
+	* CHI 2
+	{
+	tab A B, chi2  
+	}
+}
