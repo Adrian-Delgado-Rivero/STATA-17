@@ -1,0 +1,245 @@
+*7. ECONOMETRIA
+
+{
+	*7.1  RLS
+
+	{
+		reg Y X
+
+		
+	}
+	
+	*7.2. PRUEBAS
+	
+	{
+	
+	reg Y X
+	predict e, residuals
+		
+		** HETEROSCEDASTICIDAD
+		reg Y X
+		imtest, white
+		** VARIABLES OMITIDAS
+		ovtest
+		** MULTICOLINEALIDAD
+		vif
+		** NORMALIDAD
+		kdensity e, normal
+		sktest e
+		swilk e
+		** AUTOCORRELACION
+		estat bgodfrey // autocorrelacion 
+		** EXOGENEIDAD
+		estat endogenous
+		
+	}
+	
+	*7.3 DICOTOMICAS
+	
+	{
+	reg Y X D
+	reg Y X D X*D
+	
+	reg lnyprilab lnescolaridad lnexper lnexper2  lnhrs_sem   i.depto// siendo que se se uso encode con depto, para usarlo como dicotomica
+	char depto[omit]3  //permite cambiar la categoria base a la 3
+
+*		xi: reg lyhora escolaridad exper exper2 i.depto if empleado==1
+*		xi: reg ylab i.depto i.sexo i.area
+*		char depto[omit]3  //permite cambiar la categoria base
+*		xi: reg ylab i.depto 
+	
+	}
+	
+	*7.4  BI VARIADAD
+	
+	{
+		*MLP
+		
+		{
+		reg D x1 x2 x3
+
+		*Guardar la estimacion
+		predict mpl_aj
+		count if mpl_aj<0.5
+		count if mpl_aj>1
+		sum tar_deb mpl_aj
+		}
+		
+		*MODELO LOGIT 
+		
+		{
+		logit D x1 x2 x3, level (90)
+		logit D x1 x2 x3
+		logit D x1 x2 x3, or
+		logit D x1 x2 x3, or robust
+
+		*GUARDAR LA ESTIMACIÓN LOGIT
+		*EFECTOS MARGINALES DE LAS VARIABLES INDEPENDIENTES en promedio y cambio instantaneo
+		margins, dydx(x1 x2 x3)
+		margins, dydx(*) atmeans
+		mfx
+
+		*PRUEBAS DE BONDAD DE AJUSTE: PEARSON Y HOSMER-LEMESHOW 
+		*Ho: El modelo presenta un buen ajuste*
+		estat gof
+
+		*Pruebas de bondad de ajuste: observaciones predichas correctamente clasificadas*
+		estat classification
+		estat classification, cutoff(0.7)
+		}
+		
+		*MODELO PROBIT 
+		
+		{
+		probit D x1 x2 x3
+		*GUARDAR LA ESTIMACIÓN PROBIT/EFECTOS MARGINALES DE LAS VARIABLES INDEPENDIENTES
+		mfx
+
+		*PRUEBAS DE BONDAD DE AJUSTE: PEARSON Y HOSMER-LEMESHOV
+		*Ho: El modelo presenta un buen ajuste
+		estat gof
+
+		*Pruebas de bondad de ajuste: observaciones predichas correctamente clasificadas /
+		estat classification
+		estat classification, cutoff(0.7)
+
+		*VEMOS COMO CAMBIA EL EFECTO MARGINAL. EJ CON LA VARIABLE PRECIO
+		sum x1
+		probit D x1 x2 x3
+			*margins, dydx(x3) at(x1=(32(200)2557)) // VALORES A MODIFICAR
+			*marginsplot, xlabel(32(200)2557) //
+}
+		
+		*MLOGIT
+		
+		{
+			mlogit proposito i.sexo i.tipoviv i.cta_ahorro duration
+			//Logit multinomial cambiando a base 8va categoría
+			* mlogit proposito i.sexo i.tipoviv i.cta_ahorro duration, base(8)
+
+			//efectos marginales promedio
+			margins, dydx(*)
+			//efectos marginales en las medias
+			margins, dydx(*) atmeans
+			
+			//Logit multinomial con errores estándar robustos a la heteroscedasticidad
+			mlogit proposito i.sexo i.tipoviv i.cta_ahorro duration, base(8) robust
+			//Logit multinomial con errores estándar bootstrap
+			mlogit proposito i.sexo i.tipoviv i.cta_ahorro duration, base(8) vce(bs, reps(100))
+			margins, dydx(*)
+
+			//Logit multinomial con riesgo relativo
+			mlogit proposito i.sexo i.tipoviv i.cta_ahorro duration, base(8) rr
+			//Predicción de probabilidades de todas las categorías
+			predict prob_*
+
+		}
+		
+		*MPROBIT ////////////
+		
+		{
+		mprobit depto edad escolaridad
+		
+			//efectos marginales promedio
+			margins, dydx(*)
+			//efectos marginales en las medias
+			margins, dydx(*) atmeans
+			
+		*PRUEBAS DE BONDAD DE AJUSTE: PEARSON Y HOSMER-LEMESHOW 
+		*Ho: El modelo presenta un buen ajuste*
+		estat gof
+
+		*Pruebas de bondad de ajuste: observaciones predichas correctamente clasificadas*
+		estat classification
+		estat classification, cutoff(0.7)
+		}	
+			
+		*OLOGIT ////////////
+		{
+		ologit depto edad factor area
+		
+			//efectos marginales promedio
+			margins, dydx(*)
+			//efectos marginales en las medias
+			margins, dydx(*) atmeans
+		
+		*PRUEBAS DE BONDAD DE AJUSTE: PEARSON Y HOSMER-LEMESHOW 
+		*Ho: El modelo presenta un buen ajuste*
+		estat gof
+
+		*Pruebas de bondad de ajuste: observaciones predichas correctamente clasificadas*
+		estat classification
+		estat classification, cutoff(0.7)
+		}
+		
+		*OPROBIT ////////////
+		{
+		oprobit area edad escolaridad cobersalud
+
+			//efectos marginales promedio
+			margins, dydx(*)
+			//efectos marginales en las medias
+			margins, dydx(*) atmeans
+			
+		*PRUEBAS DE BONDAD DE AJUSTE: PEARSON Y HOSMER-LEMESHOW 
+		*Ho: El modelo presenta un buen ajuste*
+		estat gof
+
+		*Pruebas de bondad de ajuste: observaciones predichas correctamente clasificadas*
+		estat classification
+		estat classification, cutoff(0.7)
+
+		}	
+	
+	}
+	
+	*7.5 MCG
+	
+{
+	
+		reg lylab escolaridad exper exper2 
+		predict xb
+		reg lylab escolaridad exper exper2 [w=xb]
+}
+	
+	* 7.6. ECUACIONES SIMULTANEAS ////////////
+	
+{
+		tsset yr
+		reg3 (consump wagepriv wagegovt profits L.profits)///
+		(invest profits L.profits capital1)///
+		(wagepriv consump invest govt L.consump L.invest L.govt yr), 2sls
+		
+		reg3 (consump wagepriv wagegovt profits L.profits) ///
+		(invest profits L.profits capital1) ///
+		(wagepriv consump invest govt L.consump L.invest L.govt yr)
+		
+		gl conseq "(consump wagepriv wagegovt profits L.profits)"
+		gl inveq "(invest profits L.profits capital1)"
+		gl wagepeq "(wagepriv consump invest govt L.consump L.invest L.govt yr)"
+		
+		reg3 $conseq $inveq $wagepeq, ireg3
+		
+		margins, at(consump=(7(2)23)) plot
+		margins, at(consump=(40(2)70)) plot
+		
+		test [consump]wagepriv = [wagepriv]consump
+		
+		constraint 1 [consump]wagepriv = [wagepriv]consump
+		
+		reg3 $conseq $inveq $wagepeq, ireg3 constr(1)
+	
+}	
+
+	* 7.7. SUR
+	
+	{
+	//Modelo SUR con la prueba de que las correlaciones entre residuales de distintas ecuaciones es 0
+	sureg (science = read write math) (socst = read write i.race), corr
+	//no se rechaza la H0 de que las correlaciones entre residuales son 0, por tanto MCO sería adecuado
+
+	//SUR iterado
+	sureg (science = read write math) (socst = read write i.race), isure corr
+	}
+
+}
