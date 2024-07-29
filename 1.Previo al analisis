@@ -67,4 +67,5 @@
 	gen xy = rnormal(1000, 200) //normal con media 1000 y sd 200
 	}
 
-	}
+
+}
