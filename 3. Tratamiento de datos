@@ -1,0 +1,183 @@
+*3. TRATAMIENTO DE DATOS
+
+{
+	*3.1.  SELECCIONAMOS VARIABLES 
+
+	{
+		keep folio /// id
+			 X1 /// nombre X1 
+			 X2 /// nombre X2 
+			 X3
+
+ 	//nota: el "///" indica "continua en la linea de abajo, NO BORRAREL "///"
+	}
+
+	*3.2 GENERAR VARIABLES
+{
+	*gen ejemplos
+		generate exper = ((edad-6)-escolaridad) // ejemplo para experiencia
+			replace expe=0 if edad<0		// remplazamos experiencia nula si no tienen edad
+			label variable expe "Experiencia laboral en años" //colocamos etiquetas
+		
+		generate seg= cobersalud==1  // ejemplo para una dicotomica
+				replace seg=0 if cobersalud==2
+		replace seg=. if cobersalud==.
+
+		generate  Informalidad =1  if afp==0 | seg==0  // ejemplo para una variable con condicion logica
+			replace  Informalidad  =0  if afp==1 | seg==1 
+		
+		gen edu=X1		//generamos una nueva variable llamada edu
+			label variable edu "Años de educación" 	//colocamos una etiqueta
+	
+		
+	*egen //para crear a partir de otras variables
+		*ejem
+		egen edad_m = mean(edad) /// simple
+		by depto, sort: egen edad_mn = mean(edad) ///para cada depto
+
+}	
+	
+	*3.3. RENOMBRAR
+
+	{	
+	ren X name_X
+	
+	********************
+	rename (lnwage educ exper tenure female married kids6 kids714) ///
+	(rlnwage reduc rexper rtenure rfemale rmarried rkids6 rkids714) // renombrar las variables aumentando una r por delante para que tengan un termino común y luego sea más facil usarlas en los posteriores análisis
+}	
+	
+	*3.4. ETIQUETAR
+
+{	
+	*Etiqueamos variables
+	label variable X "name_1" 
+
+	*Etiqueamos categorías internas
+	{
+	label define D_ 0 "name_1" ///
+                   1 "name_2" ///
+                   2 "name_3" ///
+                   9 "no_data" 
+	* Asignar las etiquetas a la variable D
+	 	label value D D_
+		tab D
+	* Recodificar los valores según las categorías proporcionadas
+		decode D, generate(D_etiquetado)
+		tab D_etiquetado
+	*se crea la varaible categorica util para las regresiones dicotomicas
+		encode D_etiquetado , g(D)
+		tab D
+	}
+		}		
+				
+	
+	*3.5 CONDICIONES
+	
+	{
+	by D, sort : "funcion" (...) if condicion, generate (X_x)
+	}	
+	
+	*3.6 CLONAR
+	
+	{
+	clonevar X_ = x
+	clonevar Y_ = y if x ==1
+	}
+	
+	*3.7 DERIVADA
+
+	{	
+	by D, sort : dydx y x, generate(Z) // Solo una dependiente
+	dydx Y X, generate(z)
+	}
+	
+	*3.8 INTEGRAL
+
+	{
+		integ  Y X
+}
+	
+	*3.9 DATOS FALTANTES
+	
+{
+	* considera los valores "99" como faltantes y los elimina
+	mvdecode X, mv(99)
+	* condifica los valores faltantes con el valor "0000"
+	mvencode edad, mv(0000)
+	
+	
+}
+
+	*3.10 CREAR NUEVA BASE DE DATOS CON DESCRIPTIVOS DE LAS VARIABLES
+	
+	{
+	
+	collapse (median) Y (mean) X
+	collapse (mean) X, by(D)
+	
+	///////////////ejemplo practico ///////////
+	{
+			*2017
+			import spss using "c:\...\name_17.sav", clear
+			keep folio x y D factor
+			ren x name_x_17
+			save data_17, replace
+			collapse (mean) name_x_17, by(D)
+			save x17, replace
+
+
+			*2018
+			import spss using "c:\...\name_18.sav", clear
+			keep folio x y D factor
+			ren x name_x_18
+			save data_18, replace
+			collapse (mean) name_x_18, by(D)
+			save x18, replace
+
+
+			*2019
+			import spss using "c:\...\name_19.sav", clear
+			keep folio x y D factor
+			ren x name_x_19
+			save data_19, replace
+			collapse (mean) name_x_19, by(D)
+			save x19, replace
+
+
+			*Unir Bases de datos
+			use x17.dta, clear 
+			merge 1:1 D using x18.dta
+			drop _merge
+			merge 1:1 depto using x19.dta
+			drop _merge
+
+	}
+	}
+	
+	*3.11 BORRAR DUPLICADOS, FORZARLO
+	
+	{
+	duplicates drop area, force
+	}
+	
+	*3.12. Ordenar las observaciones por id
+	
+	{
+	sort id 
+	}
+	
+	*3.13. BORRAR 
+	
+	{
+	drop X // borrar la variable x
+	drop if D != "categoria 1"// borrar caso que sea diferente a categoria 1
+	
+	*otros ejemplos
+		drop if hrs_sem <36	//borra observaciones si trabajan menos de 36 horas a la semana
+		drop if edad <14  //borra observaciones si tienen menos de 14 años
+		drop if edad >70	 //borra observaciones si tienen más de 70 años
+		drop if ylab <50	///borra observaciones si tienen un ingreso menor a 50
+	}	
+	
+	
