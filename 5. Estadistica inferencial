@@ -1,0 +1,30 @@
+*5. ESTADISTICA INFERENCIAL PARAMETRICO
+
+{
+	* MEDIAS
+	
+	{
+		ttest X, by(D) //diferencia de medias
+		ttest X==5000	
+		ttest X==10000 if D_ ==1
+	
+		prtest X, by(D) //diferencia de proporcion
+		prtest X==0.9	
+		prtest X ==0.9 if D_==1
+		
+		
+		// intervalo de confianza
+		*		display 2949.496/sqrt(74)
+		*		display 6165+(1.96*3.4287195)
+		*		ci mean price
+
+	}
+	
+	* VARINZA
+	
+	{	
+		loneway escolaridad depto
+	}
+	
+	* NORMALIDAD
+}
