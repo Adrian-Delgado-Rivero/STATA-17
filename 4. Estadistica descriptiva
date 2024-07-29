@@ -1,0 +1,121 @@
+
+*4. ESTADISTICA DESCRIPTIVA
+
+{
+	* TABLAS
+	
+{
+		//Tabla de frecuencias
+		tab X
+		
+		// comparacion de proporciones
+		
+		sysuse cancer
+		tab drug died, row
+		tab drug died, expected
+		tab drug died, chi2 row 
+		tab drug died, exact row 
+		
+		*EJEMPLO
+		tab2 area  informal, cell chi2 exact column expected row
+		tab2 area  informal 			//frecuencia observada
+		tab2 area  informal, cell 		//porcentaje total
+		tab2 area  informal, column		//porcentaje columna
+		tab2 area  informal, expected 	//frecuencia esperada
+		tab2 area  informal, row		//porcentaje fila
+		tab2 area  informal, chi2 		// chi2 : asociacion
+		tab2 area  informal, exact 		//  Fisher's Exact: asociacion
+
+		****TABLA PERSONALIZADA*****
+		
+		table ( fila ) ( columna ), statistic(commando  X)	
+		
+		*ejemplo
+		table ( depto ) ( area ), statistic(mean  escolaridad)	
+		table ( depto ) ( area ) ( mujer ), statistic(mean  escolaridad) statistic(mean  exper)// segmentado para mujer, para las estadisticas de escolaridad y exper
+		
+		
+		}
+
+	* TENDENCIA CENTRAL
+{
+	
+		codebook ylab sexo escolaridad edad area hrs_sem if empleado==1
+		sum ylab edad escolaridad hrs_sem if empleado==1
+
+			
+		
+		tabstat escolaridad, statistics( mean count  sum max min  median  p1 p10 p25 p50 p75 p90 p99) by(depto)
+		
+				mean // promedio
+				count // conteo no vacio
+				sum // suma * ojo fuera de la tabla dara sumario
+				max // maximo
+				min // minimo
+				median// mediana
+				p90 // percentil 90
+				p25 // percentil 25
+		
+		* Con restricciones
+		tabstat escolaridad if depto ==1, statistics( mean count  sum max min ) by (area)
+		
+		* Ponderado por el factor de expansión
+		sum yprilab edad escolaridad [w=factor]if area==1 & mujer==1
+
+
+	
+		*Media
+		
+		ameans yprilab // media aritmetica, geometrica , harmonica
+		proportion depto // proporcion 
+		
+		*Estandarizacion
+		egen escolaridad_std = std(escolaridad)
+
+			*Estandarizar un conjunto de variables
+			foreach Z in escolaridad exper yprilab {
+			egen `Z'_std = std(`Z')
+			}
+		
+		*Sumario para conjuntos de variables
+		
+		sum *_std // summario de todo lo que termine con "_std"
+		sum Z*		// sumario de todo lo que inicie con "Z"
+		
+}	
+	
+	* VARIABILIDAD
+	
+	{
+		
+
+		tabstat escolaridad, statistics( sd var cv semean range iqr skewness kurtosis) by(depto)
+		
+		cv // coef variacion 
+		range // rango
+		iqr //rango intercuantil (75-25)
+		var // varianza
+		sd // desviacion estandar
+		semean // error estandar de la media 
+		skewness // asimetria
+		kurtosis // kurtosis
+
+		
+	}
+	
+	* CORRELACION
+	
+	{
+	corr X1 X2
+	
+	spearman escolaridad yprilab
+*	ktau escolaridad yprilab, stats(p)
+	
+	}
+	
+	* INDICES
+
+	{
+		 ratio (mmm: yprilab/escolaridad), fvwrap(1)
+	}
+}
