@@ -1,1 +1,126 @@
 
+*14. GRAFICOS
+
+
+{
+
+*histograma
+
+{
+histogram price, title(Grafico de histograma) subtitle(price en miles de USD) ytitle(frecuencia) xtitle(precio) note(Fuente: Datos auto Stata) name(grafico1,replace)
+}
+
+*kdensity
+
+{
+kdensity price, title(Grafico de histograma) subtitle(price en miles de USD) ytitle(frecuencia) xtitle(precio) note(Fuente: Datos auto Stata) name(grafico2,replace)
+}
+
+*Histograma + densidad
+{
+histogram price, kdensity
+histogram price, kdensity title(Grafico de histograma) subtitle(price en miles de USD) ytitle(frecuencia) xtitle(precio) note(Fuente: Datos auto Stata) name(grafico3)
+
+}
+
+*combinar
+
+{
+
+graph combine grafico1 grafico2 //combinams los graficos guardados en memoria
+graph combine grafico1 grafico2 grafico3
+graph export "grafico1ygrafico2rr.pdf", replace //exporta el ultimo grafico conbinado
+}
+
+*barras
+
+{
+graph bar (mean) price, over(foreign)
+		gen marca=word(make,1) 
+		gen peso=(weight>3000)   //dummy 
+graph bar (mean) price, over(foreign) over(peso)
+graph bar (mean) price, over(peso,gap(1)) over(foreign)  title(Grafico de barras) subtitle(Por foraneo y peso) ytitle(Promedio)  note(Fuente: Datos auto Stata) 
+
+* Grafico con etiquetas
+label define peso 1 "Pesado" 0 "Liviano", replace
+label values peso peso
+
+// Etiqueta de valores
+graph bar (mean) price, over(peso,gap(1)) over(foreign)  title(Grafico de barras) subtitle(Por foraneo y peso) ytitle(Promedio)  note(Fuente: Datos auto Stata) 
+
+// Etiqueta de datos
+graph bar (mean) price, over(peso,gap(1)) over(foreign) blabel(bar)  title(Grafico de barras) subtitle(Por foraneo y peso) ytitle(Promedio)  note(Fuente: Datos auto Stata) 
+}
+* Grafico de caja
+graph box price
+tabstat price, s(max p75 p50 min)
+graph box price, over(peso)
+graph box price, by(peso)
+graph box price, over(peso) over(foreign)
+
+
+
+*Dispersion
+
+{
+//grafico de dispersion
+twoway (scatter rep78 mpg) 
+twoway (scatter rep78 mpg) (lfit rep78 mpg)//ajuste de linea
+
+// EN MATRIZ
+
+graph matrix  price mpg weight displacement
+br
+graph matrix  price mpg weight displacement, half
+
+
+}
+
+*Pie
+
+{
+graph pie, over(marca)
+graph pie, over(foreign) by(peso) plabel(_all percent)
+}
+
+*Otro	
+{
+	
+	*Grafico 
+ssc install catplot
+
+catplot rep78
+catplot rep78, blabel(bar, pos(base) size(4)) bar(1, bfcolor(none))ysc(off) // Aañade etiquetas a las barras en el gráfico anterior y modifica algunos aspectos de su apariencia, como el tamaño de las etiquetas y el color de las barras.
+catplot rep78 foreign //  Genera un gráfico de barras por categorica
+catplot rep78 foreign, nofill //, pero sin rellenar las barras con colores.
+catplot rep78, by(foreign) percent(foreign) //barras por categorica en porcentajes
+catplot rep78, by(foreign) percent(foreign) recast(bar) // orientacion vertical
+catplot rep78 foreign, percent(foreign) bar(1, bcolor(blue)) ///
+   blabel(bar, position(outside) format(%3.1f)) ylabel(none) ///
+   yscale(r(0,60)) //escala y
+
+gen himpg = mpg > 25
+label def himpg 1 "mpg > 25" 0 "mpg <= 25"
+label val himpg himpg
+
+catplot peso rep78 foreign
+
+catplot himpg rep78 foreign
+catplot rep78 foreign, by(himpg, col(1) note("")) subtitle(, pos(9) /// permite agrupar los datos por la variable himpg, muestra en una columna la grafica
+   ring(1) bcolor(none) nobexpand place(e)) //autoajustado
+
+catplot rep78 foreign, recast(dot) by(himpg, col(1) note("")) ///
+   subtitle(, pos(9) ring(1) bcolor(none) nobexpand place(e))
+catplot rep78 foreign, recast(bar) by(himpg, row(1) note("")) ///
+   subtitle(, pos(6) ring(1) bcolor(none) nobexpand)
+
+catplot rep78, var1opts(sort(1))
+catplot rep78, var1opts(sort(1) descending)
+
+
+
+
+}	
+	
+}
+
