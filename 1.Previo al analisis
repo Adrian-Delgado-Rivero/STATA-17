@@ -1,38 +1,74 @@
-*1. PREVIO
+////////////////////////////////////////////////////////////////////////////////
+//	PROYECTO: INTRODUCCION A STATA
+//	AUTOR: ADRIAN ALEJANDRO DELGADO RIVERO
+//	BASE DE DATOS: -
+//	FUENTE: -
+//	VARIABLES: -
+//	CONTACTO: draadrian3082000@gmail.com	
+//	CONTACTO: +591 69539797
+// 	PAIS: Bolivia
+////////////////////////////////////////////////////////////////////////////////
 
+*1. UTILIDADES PREVIAS
+	*1.1. COMENTARIOS: Una buena practica de programacion es comentar el codigo indicando que realiza una funcion o en que etapa del codigo uno se encuentra.
 {
-	*1.1. ARCHIVO DE REGISTRO
+	* Existen dos formas de comentar el codigo dentro de STATA:
+	* (1) Usando "*" al inicio de la linea de codigo, asi toda la linea sera un comentario
+	* (2) Usando "//" que se puede utilizar de dos formas
+	*	(a) Al inicio de la linea de cogio, para que toda la linea sea un comentario
+	*	(b) Al final de un codigo, para poder explicar que realiza dicho codigo
+	*		Ejem: 
+		set mem 300m // Aumenta la memoria del sistema a 300 megas
+	}
+	*1.2. OCULTAR LINEAS DE CODIGO: Para poder revisar el do. file de forma rapida entre secciones establecidas por el analista se puede abreviar el codigo de dos formas:
+{
+	* (1) Usando "{}" Permite ocultar todas las lineas de codigo que esten dentro del rango que esta dentro de las llaves 
+	* (2) Usando "/*" Permite ocultar todas las lineas de codigo que esten por debajo de la misma
+}
+	*1.3. COMANDOS PREVIOS AL ANALISIS: Antes de realizar cualquier analisis estadictico es necesario ejecutar unos cuantos comandos previos en STATA
+{	
+	*(1) Memoria: El sistema tiene una memoria limitada, por lo que es necesario ampliarla
+	{
+	set memory 50m		 // aumentamos la memoria del sistema a 50 megas
+	set max memory 2048m // establecemos la memoria maxima
+	}			
 
+	*(2) Directorio: Nos permite almacenar y abrir archivos del una carpeta (do files, log, bases de datos)
+{
+	*Creamos el directorio en la carpeta EJEMPLO, dentro la ruta
+	
+	cd "C:\Users\Usuario\Documents\Bases de datos\EJEMPLO"
+	
+	*Nota: Para que funcione esta linea de codigo crear en la carpeta Documents la carpeta "Bases de datos" y dentro creamosla carpeta "EJEMPLO"
+}
+
+	*(3) Archivo de registro
+		{
+	
+		*(a) Abrimos /creamos archivo de registro (guarda los resultados obtenidos). Se tienien dos opciones:	
+	log using name.smcl // para archivo smcl
+	log using name.log // para archivo log (es más facil llevarlo a excel)
+
+		*Nota: En caso de no tener un directorio definido el codigo seria el siguiente:
 	{
-	*Abrimos /creamos archivo de registro (guarda los resultados obtenidos)
-	log using "C:\Users\Usuario\Documents\...\name.smcl" // para archivo smcl
-	log using "C:\Users\Usuario\Documents\...\name.log" // para archivo log (es más facil llevarlo a excel)
-	*Suspendemos el grabado de registro (idealmente hacerlo cuando se esta en un periodo de prueba y error)
+	log using "C:\Users\Usuario\Documents\Bases de datos\EJEMPLO\name.smcl" 
+	log using "C:\Users\Usuario\Documents\Bases de datos\EJEMPLO\name.log" 
+	}
+		*(b) Suspendemos el grabado de registro (idealmente hacerlo cuando se esta en un periodo de prueba y error)
 	log off
-	*Suspendemos el grabado de registro (reanudamos cuando tenemos el analisis en limpio)
+
+		*(c) Suspendemos el grabado de registro (reanudamos cuando tenemos el analisis en limpio)
 	log on
-	*Cerramos el archivo de registro (una vez concluido el analisis )//
-	log close
-	}
-	
-	*1.2  CAMBIAMOS DIRECTORIO
-	{
-	* Nos permite almacenar y abrir archivos del una carpeta (do files, log, bases de datos)
-	cd "C:\Users\Usuario\Documents\...\..."
+		
+		*(d) Cerramos el archivo de registro (una vez concluido el analisis )//
+	log close	
 	
 	}
 	
-	*1.3 MEMORIA
-	{
-	set memory 50m // aumentamos la memoria del sistema a 50 megas
-	set max memory 2048m // estabblecemos la memoria maxima
-				
 	}
-	
-	*1.4 FUNCIONES
+*2. FUNCIONES
+	* 2.1 Expresiones Logicas Significado
 	{
-	*Expresiones Logicas Significado
-	
 	& // Y (AND)
 	| // O (OR)
 	> //  Mayor que
@@ -41,15 +77,16 @@
 	! = // Diferente a
 	>= // Mayor o Igual
 	<= // Menor o Igual
-	
-*	Expresiones Aritmeticas
-
+	}
+	*2.2 Expresiones Aritmeticas
+	{
 	+ // Mas, 
 	- // Menos
 	* // multiplicacion
 	/ // division
-
-	* Algunas funciones Matematicas
+	}
+	*2.3 Algunas funciones Matematicas
+	{
 	abs() Valor absoluto
 	comb(n,k) //the combinatorial function n!=/{k!(n - k)!}
 	exp(x) /// función exponencial
@@ -63,8 +100,155 @@
 	sum() /// La suma para la expresi´on entre par´entesis.
 	*uniform(100) /// Genera n´umeros aleatoreos entre 0 y 1 con una distribuci´on uniforme.
 	help *functions* /// Ayuda respecto a una funcion
-	* Crear variables con districiones estadisticas
-	gen xy = rnormal(1000, 200) //normal con media 1000 y sd 200
 	}
+*3. ARCHIVOS DE MUESTRA
+
+	* 3.1 Archivos de muestra dentro STATA
+	{
+	sysuse dir		//directorio de archivos  de muestra
+	sysuse auto 		//usamos el archivo de muestra auto 
+
+	*Otros archivos muestra
+	* auto.dta        bpwide.dta      educ99gdp.dta   nlsw88.dta      surface.dta     voter.dta
+	* auto16.dta      cancer.dta      gnp96.dta       nlswide1.dta    tsline1.dta     xtline1.dta
+	* auto2.dta       census.dta      lifeexp.dta     pop2000.dta     tsline2.dta
+	* autornd.dta     citytemp.dta    network1.dta    sandstone.dta   uslifeexp.dta
+	* bplong.dta      citytemp4.dta   network1a.dta   sp500.dta       uslifeexp2.dta
+	}
+	* 3.2 Archivos de muestra del libro de wooldrige
+{
+
+	*Bases datos de wooldriche en stata http://fmwww.bc.edu/ec-p/data/wooldridge/datasets.list.html
+	ssc install 	       // instalar Comando
+	ssc install Bcouse   //Instalar commando bcouse (Comando para usar bases de datos de wooldrige
+	bcuse bwght	      //abrir base de datos "bwght" del libro de wooldrige (Actualiado)
 
 	}
+*4. SINTAXIS DEL CODIGO: De manera general, la sintaxis de STATA es la siguiente: 
+
+	* [prefix :] command [varlist] [=exp] [if] [in] [weight] [using filename] [, options]
+	* Ejemplo con By:
+	*[by lista de var :] comandolista de var [if expresion], [opciones] // abreviado
+	*[by lista de var :] comando lista de var [if expresion] [in rango] [ponderadores] [using nombre del archivo], [opciones]
+
+	*4.1 Prefijos
+	{
+	*Prefijo       Description
+	/////////////////////////////////////////////////////////////////////////////////////////
+	by           // ejecutar el comando en subconjuntos de datos
+	frame        // ejecutar el comando en los datos de un marco especificado
+	collect      // ejecutar el comando y recoger resultados para incluir en una tabla
+	statsby      // igual que by, pero recoge estadísticas de cada ejecución
+	rolling      // ejecutar el comando en subconjuntos móviles y recoger estadísticas
+	bootstrap    // ejecutar el comando en muestras bootstrap
+	jackknife    // ejecutar el comando en subconjuntos de datos jackknife
+	permute      // ejecutar el comando en permutaciones aleatorias
+	simulate     // ejecutar el comando en datos fabricados
+	svy          // ejecutar el comando y ajustar los resultados para muestreo de encuestas
+	mi estimate  // ejecutar el comando en datos imputados múltiples y ajustar los resultados para la imputación múltiple (MI)
+	bayes        // ajustar el modelo como una regresión bayesiana
+	fmm          // ajustar el modelo usando modelado de mezclas finitas
+	nestreg      // ejecutar el comando con bloques acumulados de regresores e informar pruebas de comparación de modelos anidados
+	stepwise     // ejecutar el comando con inclusión/exclusión de variables de manera progresiva
+	xi           // ejecutar el comando después de expandir las variables de factor e interacciones; para la mayoría de los comandos, es preferible usar variables de factor en lugar de xi (ver fvvarlist)
+	fp           // ejecutar el comando con polinomios fraccionarios de un regresor
+	mfp          // ejecutar el comando con múltiples regresores de polinomios fraccionarios
+	capture      // ejecutar el comando y capturar su código de retorno
+	noisily      // ejecutar el comando y mostrar la salida
+	quietly      // ejecutar el comando y suprimir la salida
+	version      // ejecutar el comando bajo una versión especificada
+	/////////////////////////////////////////////////////////////////////////////////////////
+	}
+	*4.2 Bucles: Pemite repetir una serie de comandos para un grupo de variables definidas
+	{
+	*FOREACH
+		foreach X_name in x1 x2 x3  {
+		  commando 1
+		  commando 2
+		  commando 3
+		  }
+
+	*EJEMPLO	
+		 foreach Y_name in x1 x2 x3 {
+		  egen z_`Y_name'= std(`Y_name')
+		  sum `Y_name'
+		  mean `Y_name'
+				  }  
+	}
+	*4.3 Macros
+		*(1) local: Una macro de memoria de corto plazo, una vez concluida la ejecucucion de una seccion del codigo no se almacena y es necesario re definirla para volver a usarla
+	{		
+		local continuous price mpg make
+		tab1 `continuous'
+		codebook `continuous'
+		summarize `continuous'
+		
+		local  vlist "y x1 x2"
+		display "vlist contiene $vlist"		
+		
+		local a "myvar"
+		generate `a' = oldvar /// equivale a  generate myvar = oldvar
+	
+		local a "newvar"
+		local i = 2
+		generate `a'`i' = /// equivale a  generate newvar2 = oldvar
+		}
+		*(2) global: Una macro de memoria de largo plazo, una vez concluida la ejecucucion de una seccion del codigo se almacena y no necesario re definirla para volver a usarla
+	{
+		global  vlist "y x1 x2"
+		display "vlist contiene $vlist"
+
+		global continuous price mpg make
+		tab1 $vlist
+		codebook $vlist
+		summarize $vlist
+
+		
+		global a "myvar"
+		generate $a = oldvar /// equivale a  generate myvar = oldvar
+
+	
+		global a "newvar"
+		global i = 2
+		generate $a$i = oldvar /// equivale a  generate newvar2 = oldvar
+		
+	}	
+
+	*4.4. Bucle condicional
+	{
+		*(1)Repeticion condicionada
+		{
+			local t=1
+			while `t'<10 { //mientras se cumpla una condicion  se repitira el bucle
+				di `t'
+				local t=`t'+1
+			}}
+		*(2) Resultado condicionado
+		{
+			local p=10
+			if `p'==10 {// si se cumple la condicion ####
+				di "`r' es igual a 10"
+				local r=`r'+1
+				}
+			else {// caso contrario ####
+				di "`p' es diferente a 10"
+				}}
+}
+	*4.5. Continuar codigo: Para poder escribir una instruccion en más de unas sola linea
+	{
+	*Usando  "///" al final de cada instruccion 
+
+	*Ejemplo:
+	* Codigo sin modificar
+	graph hbar (mean) price, over(weight,gap(1)) over(foreign) title(Grafico de barras) subtitle(Por foraneo y peso) ytitle(Promedio)  note(Fuente: Datos auto Stata) 
+
+	* Codigo modificado
+	graph hbar (mean) price, over(weight,gap(1)) ///
+			over(foreign)  ///
+			title(Grafico de barras) ///
+			subtitle(Por foraneo y peso) ///
+			 ytitle(Promedio)  ///
+			 note(Fuente: Datos auto Stata) 
+	}
+			 
+	
