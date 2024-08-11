@@ -50,7 +50,7 @@
 	
 		*(a) Abrimos /creamos archivo de registro (guarda los resultados obtenidos). Se tienien dos opciones:	
 	log using name.smcl // para archivo smcl
-	log using name.log // para archivo log (es más facil llevarlo a excel)
+	log using name.log, replace // para archivo log (es más facil llevarlo a excel)
 
 		*Nota: En caso de no tener un directorio definido el codigo seria el siguiente:
 	{
@@ -70,10 +70,12 @@
 	
 	}
 }
+
 *2. FUNCIONES
 {
 	* 2.1 Expresiones Logicas Significado
 	{
+	
 	& // Y (AND)
 	| // O (OR)
 	> //  Mayor que
@@ -83,6 +85,7 @@
 	>= // Mayor o Igual
 	<= // Menor o Igual
 	}
+	
 	*2.2 Expresiones Aritmeticas
 	{
 	+ // Mas, 
@@ -176,10 +179,8 @@
 		  }
 
 	*EJEMPLO	
-		 foreach Y_name in x1 x2 x3 {
-		  egen z_`Y_name'= std(`Y_name')
+		 foreach Y_name in  price mpg {
 		  sum `Y_name'
-		  mean `Y_name'
 				  }  
 	}
 	*4.3 Macros
@@ -259,3 +260,4 @@
 	}
 			 
 }	
+
