@@ -29,6 +29,7 @@
 {	
 	*(1) Memoria: El sistema tiene una memoria limitada, por lo que es necesario ampliarla
 	{
+	clear all	//Borra todo registro en la memoria de stata
 	set memory 50m		 // aumentamos la memoria del sistema a 50 megas
 	set max memory 2048m // establecemos la memoria maxima
 	}			
