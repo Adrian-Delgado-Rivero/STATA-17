@@ -1,17 +1,50 @@
-*2. BASES DE DATOS
+////////////////////////////////////////////////// ///////////////////////////////
+// PROYECTO: BASES DE DATOS
+// AUTOR: ADRIAN ALEJANDRO DELGADO RIVERO
+// BASE DE DATOS: -
+// FUENTE: -
+// VARIABLES: -
+// CONTACTO: draadrian3082000@gmail.com	
+// CONTACTO: +591 69539797
+// PAIS: Bolivia
+////////////////////////////////////////////////// ///////////////////////////////
 
-{
-	* 2.1 IMPORTAMOS BASE DE DATOS
-{
+*1. PREVIO  
+	* Memoria
+		set mem 300m // Aumenta la memoria del sistema a 300 megas
+	* Directorio
+		cd "C:\Users\Usuario\Documents\Bases de datos\EJEMPLO"
+		
+	* Archivo de registro
+		log using name.log, replace 
+		*log close // off on 
+		
+*2. DATOS.
+
+	*2.1. IMPORTAMOS BASES DE DATOS
+	*2.1.1. SAV (SPSS)
 	import spss "C:\Users\Usuario\Documents\Bases de datos\...\...\name.sav",clear /// spss
-	import excel "C:\Users\Usuario\Documents\...\name.xlsx", sheet("Hoja1") firstrow clear /// excel
-	import excel "C:\Users\Usuario\Documents\...\datas ceres.xlsx", sheet("Hoja1") cellrange(A2:A35) firstrow clear /// // rango de celdas en excel 
-	import excel "C:\Users\Usuario\Documents\...\datas ceres.xlsx", sheet("Hoja1") cellrange(A2:A35) firstrow allstring clear //todas son texto
+	*clear es para borrar de la memoria del programa la base de datos anterior
+	*Ejemplo
+	{
+	import spss "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2022\EH2022_Persona", clear // abrimos la EH_2022, seccion personas
+	import spss "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2021\EH2021_Persona", clear // abrimos la EH_2021, seccion personas
+	import spss "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2020\EH2020_Persona", clear // abrimos la EH_2020, seccion personas
+	}
+	*2.1.1. XLSX (EXCEL)
+	
+		import excel "C:\Users\Usuario\Downloads\Reporte (7).xlsx", sheet("Hoja1") cellrange(A1:C15) firstrow clear // rango de celdas en excel 
+
+	
+	*import excel "C:\Users\Usuario\Documents\...\name.xlsx", sheet("Hoja1") firstrow clear /// excel
+	*import excel "C:\Users\Usuario\Documents\...\datas ceres.xlsx", sheet("Hoja1") cellrange(A2:A35) firstrow clear /// // rango de celdas en excel 
+	*import excel "C:\Users\Usuario\Documents\...\datas ceres.xlsx", sheet("Hoja1") cellrange(A2:A35) firstrow allstring clear //todas son texto
+	
 }
 	
-	* 2.2. ABRIMOS BASE DE DATOS
+	* 2.2. ABRIMOS BASE DE DATOS DE DTA (STATA)
 	{
-	use "C:\Users\Usuario\Documents\...\...\...\name.dta", clear
+	use "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2009\EH 2009\Eh09_vivienda.dta", clear
 	}
 	
 	* 2.3 DESCRIBIMOS LA BASE DE DATOS
@@ -22,35 +55,114 @@
 	display _N // indica el numero de observaciones existentesd
 	describe X // superficial
 }	
+
+
+	*2.4 CREAR NUEVA BASE DE DATOS CON DESCRIPTIVOS DE LAS VARIABLES
 	
-		* 2.4 UNIMOS BASE DE DATOS (VARIABLES)
+		{
+	
+	collapse (median) Y (mean) X
+	collapse (mean) X, by(D)
+	
+		}
+	* 2.5 UNIMOS BASE DE DATOS (VARIABLES)
+
 	{
+	*MERGE 1:1
 	use BD_1.dta,clear
 	merge 1:1 id using BD_2.dta // cuando el # de observaciones es el mismo en ambas bases
 	drop _merge
 	sav BD_unida, replace
-
+	*MERGE M:1
 	use BD_1.dta,clear
 	merge m:1 id using BD_2.dta // cuando el # de observaciones es el mayor en la primera bd
 	drop _merge
 	sav BD_unida, replace
-
+	*MERGE 1:M
 	use BD_1.dta,clear
 	merge 1:m id using BD_2.dta // cuando el # de observaciones es el menor en la primera bd
 	drop _merge
 	sav BD_unida, replace
-	
+	*MERGE M:M
 	use BD_1.dta,clear
 	merge m:m id using BD_2.dta //  cuando el # de observaciones es diferente en ambas bases
 	drop _merge
 	sav BD_unida, replace
-	}
+	**	||| 	NOTA: id es la variable de identificación ||| 	***
+	}	
 	
+
+	///////////////ejemplo practico ///////////
+	
+*	EJEMPLO:
+	{
+	*DATA	2022
+	import spss using "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2022\EH2022_Persona.sav", clear
+	collapse (mean) ylab, by(depto)
+	ren ylab ylab_2022
+	save data_22.dta, replace
+	*DATA	2021
+	import spss using "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2021\EH2021_Persona.sav", clear
+	collapse (mean) ylab, by(depto)
+	ren ylab ylab_2021
+	save data_21.dta, replace
+	*DATA	2020
+	import spss using "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2020\EH2020_Persona.sav", clear
+	collapse (mean) ylab, by(depto)
+	ren ylab ylab_2020
+	save data_20.dta, replace
+	*DATA	2019
+	import spss using "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2019\EH2019_Persona.sav", clear
+	collapse (mean) ylab, by(depto)
+	ren ylab ylab_2019
+	save data_19.dta, replace
+	*UNION DE DATOS
+	use data_19.dta,clear
+	merge 1:1 depto using data_20.dta 
+	drop _merge
+	sav data_19_20.dta, replace
+	*UNION DE DATOS
+	use data_21.dta,clear
+	merge 1:1 depto using data_22.dta 
+	drop _merge
+	sav data_21_22.dta, replace
+	*UNION DE DATOS (FINAL)
+	use data_19_20.dta,clear
+	merge 1:1 depto using data_21_22.dta 
+	drop _merge
+	sav data_21_22.dta, replace
+	}	
 	* 2.5 UNIMOS BASE DE DATOS (CASOS)
 	
 	{
-	use BD_1.dta, clear
-	append using BD_2.dta
+	*DATA	2022		
+	import spss using "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2022\EH2022_Persona.sav", clear
+	collapse (mean) ylab , by( depto )
+	gen año=2022
+	sav ylab_2022.dta, replace
+	*DATA	2021
+	import spss using "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2021\EH2021_Persona.sav", clear
+	collapse (mean) ylab , by( depto )
+	gen año=2021
+	sav ylab_2021.dta, replace
+	*DATA	2020
+	import spss using "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2020\EH2020_Persona.sav", clear
+	collapse (mean) ylab , by( depto )
+	gen año=2020
+	sav ylab_2020.dta, replace
+	*DATA	2020
+	import spss using "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2019\EH2019_Persona.sav", clear
+	collapse (mean) ylab , by( depto )
+	gen año=2019
+	sav ylab_2019.dta, replace		
+		
+	*UNION DE DATOS (FINAL)		
+	use ylab_2019.dta, clear
+	append using ylab_2020.dta
+	append using ylab_2021.dta
+	append using ylab_2022.dta
+	sav Ylab_19_222
+	
 	}
 	
 	* 2.6. GUARDAMOS LA BASE DE DATOS
