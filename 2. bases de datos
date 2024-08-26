@@ -16,7 +16,7 @@
 		cd "C:\Users\Usuario\Documents\Bases de datos\EJEMPLO"
 		
 	* Archivo de registro
-		log using name.log, replace 
+		*log using name.log, replace 
 		*log close // off on 
 		
 *2. DATOS.
