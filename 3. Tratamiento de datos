@@ -1,51 +1,132 @@
+////////////////////////////////////////////////// ///////////////////////////////
+// PROYECTO: TRATAMIENTO DE VARIABLES
+// AUTOR: ADRIAN ALEJANDRO DELGADO RIVERO
+// BASE DE DATOS: -
+// FUENTE: -
+// VARIABLES: -
+// CONTACTO: draadrian3082000@gmail.com	
+// CONTACTO: +591 69539797
+// PAIS: Bolivia
+////////////////////////////////////////////////// ///////////////////////////////
+
+
+*1. PREVIO  
+	* Memoria
+		set mem 300m // Aumenta la memoria del sistema a 300 megas
+	* Directorio
+		cd "C:\Users\Usuario\Documents\Bases de datos\EJEMPLO"	
+	* Archivo de registro
+		* log using name.log, replace 
+		* log close // off on 
+		
+*2. DATOS.
+
+	*2.1. IMPORTAMOS BASES DE DATOS
+	import spss "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2022\EH2022_Persona", clear // abrimos la EH_2022, seccion 
+	
+
 *3. TRATAMIENTO DE DATOS
 
 {
-	*3.1.  SELECCIONAMOS VARIABLES 
+	*3.1.  SELECCIONAMOS VARIABLES A MANTENER
 
 	{
 		keep folio /// id
 			 X1 /// nombre X1 
 			 X2 /// nombre X2 
-			 X3
-
- 	//nota: el "///" indica "continua en la linea de abajo, NO BORRAREL "///"
+			 X3 
+			 
+	*nota: el "///" indica el codigo continua en la linea de abajo, NO BORRAR EL "///"
+	
+	*Ejemplo:
+	keep folio /// id
+		aestudio /// escolaridad
+		s01a_03 /// edad
+		cobersalud /// tiene seguro medico
+		s04f_35 /// afiliado a AFP
+		depto	/// departamento
+		ylab	/// ingresos laboral
+		ynolab	/// ingreso no laboral
+		s01a_02 // Sexo
+	
 	}
 
-	*3.2 GENERAR VARIABLES
-{
-	*gen ejemplos
+	*3.2. RENOMBRAR
+
+	{	
+	ren nombre nuevo_nombre
+	*	EJEMPLO	
+	ren folio id
+	
+	*Tambien existe otra forma de hacerlo
+	
+	rename (aestudio 		s01a_03   	s01a_02) ///
+			(escolaridad 	edad   		sexo) 
+}	
+
+
+	*3.3. GENERAR VARIABLES
+
+	*GENERATE
+	generate [type] newvar[:lblname] =exp [if] [in] [, before(varname) | after(varname)]
+	
+	{
+	*EJEMPLO
+	
+		gen ytotal = ylab + ynolab		//generamos una nueva variable llamada ytotal
+			label variable ytotal "Ingreso total" 	//colocamos una etiqueta
+		
 		generate exper = ((edad-6)-escolaridad) // ejemplo para experiencia
 			replace expe=0 if edad<0		// remplazamos experiencia nula si no tienen edad
 			label variable expe "Experiencia laboral en años" //colocamos etiquetas
 		
 		generate seg= cobersalud==1  // ejemplo para una dicotomica
-				replace seg=0 if cobersalud==2
-		replace seg=. if cobersalud==.
+			replace seg=0 if cobersalud==2 // remplazamos para valores del caso
+			replace seg=. if cobersalud==. // remplazamos para valores faltante
 
-		generate  Informalidad =1  if afp==0 | seg==0  // ejemplo para una variable con condicion logica
-			replace  Informalidad  =0  if afp==1 | seg==1 
+		generate AFP= s04f_35 ==1  // ejemplo para una dicotomica
+			replace AFP=0 if s04f_35 ==2
+			replace AFP=. if s04f_35 ==.
+			
+		generate  informalidad =1  if AFP==0 | seg==0  // ejemplo para una variable con condicion logica
+			replace  informalidad  =0  if AFP==1 | seg==1 
+
+}
+	*EGEN [Se usa para crear a partir de otras variables]
+	egen [type] newvar = fcn(arguments)[if][in],[options]
+
 		
-		gen edu=X1		//generamos una nueva variable llamada edu
-			label variable edu "Años de educación" 	//colocamos una etiqueta
-	
+		*EJEMPLO:
 		
-	*egen //para crear a partir de otras variables
-		*ejem
-		egen edad_m = mean(edad) /// simple
-		by depto, sort: egen edad_mn = mean(edad) ///para cada depto
+		*Creamos la variable de media de edad 
+		egen edad_media = mean(edad) // simple
+		tab edad_media
 
-}	
-	
-	*3.3. RENOMBRAR
+		*Creamos la variable de media de edad para cada depto
+		by depto, sort: egen edad_mn = mean(edad) //para cada depto
+		tab edad_mn
+		
+		*Creamos la variable estandarizada para edad
+		egen std_edad = std( edad )
+		
+		
+		* Creamos una variable con intervañps de la variable edad
+		* < 18|18-24 | 25-40 | 41 -50 | > 51
+		generate edad_grp=recode(edad,18,24,40,50,65) 
+		*nota: 65 es un ejemplo, se puede usar cualquier numero mayor a 50 
+		egen edad_grp2 = group(edad_grp)
+		tab edad_grp2
+		}	
 
-	{	
-	ren X name_X
+	*ENCODE (String a numerico)
+	encode varname[if][in], generate(newvar)[label(name) noextend]
 	
-	********************
-	rename (lnwage educ exper tenure female married kids6 kids714) ///
-	(rlnwage reduc rexper rtenure rfemale rmarried rkids6 rkids714) // renombrar las variables aumentando una r por delante para que tengan un termino común y luego sea más facil usarlas en los posteriores análisis
-}	
+
+	*DECODE (Numerico a string)
+	decode varname[if][in], generate(newvar)[maxlength(#)]
+	*Nota: primero debe estar etiqutada la varible
+	
+
 	
 	*3.4. ETIQUETAR
 
@@ -53,24 +134,60 @@
 	*Etiqueamos variables
 	label variable X "name_1" 
 
-	*Etiqueamos categorías internas
+	
+	*EJEMPLO
+	label variable ytotal "Ingreso total" 	//colocamos una etiqueta
+	
+	
+	*Etiqueamos categorías internas de las varibles
 	{
-	label define D_ 0 "name_1" ///
+	label define X_ 0 "name_1" ///
                    1 "name_2" ///
                    2 "name_3" ///
                    9 "no_data" 
 	* Asignar las etiquetas a la variable D
-	 	label value D D_
-		tab D
+	 	label value X X_
+		tab X
 	* Recodificar los valores según las categorías proporcionadas
-		decode D, generate(D_etiquetado)
-		tab D_etiquetado
+		decode X, generate(X_texto)
+		tab X_texto
 	*se crea la varaible categorica util para las regresiones dicotomicas
-		encode D_etiquetado , g(D)
-		tab D
+		encode X_texto , generate(X_numerico)
+		tab X_numerico
 	}
-		}		
+	
+
+	*EJEMPLO
+		
 				
+	*Etiqueamos categorías internas
+	{
+		
+	
+	label define D_ 1 "Chuquisaca" ///
+                   2 "La Paz " ///
+                   3 "Cochabamba" ///
+                   4 "Oruro" ///
+				   5 "Potosi" ///
+                   6 "Tarija" ///
+				   7 "Santa Cruz" ///
+                   8 "Beni" ///
+				   9 "Pando"
+				  
+	* Asignar las etiquetas a la variable D
+	 	label value depto D_
+		tab depto
+				
+	* Recodificar los valores según las categorías proporcionadas
+		decode depto, generate(depto_texto)
+		tab depto_texto
+	*se crea la varaible categorica util para las regresiones dicotomicas
+		encode depto_texto , generate(depto_numerico)
+		tab depto_numerico
+	}
+	}
+
+
 	
 	*3.5 CONDICIONES
 	
@@ -81,8 +198,15 @@
 	*3.6 CLONAR
 	
 	{
-	clonevar X_ = x
-	clonevar Y_ = y if x ==1
+	clonevar x_ = x
+	clonevar x_c = x if y == c
+
+	*EJEMPLO:
+	
+	clonevar ytotal_ = ytotal // clonamos la variable de ingresos totales
+	
+	clonevar ytotal_cbba = ytotal_ if depto == 3 // clonamos ingresos para CBBA.
+
 	}
 	
 	*3.7 DERIVADA
@@ -101,10 +225,12 @@
 	*3.9 DATOS FALTANTES
 	
 {
+	* condifica los valores faltantes con el valor "99"
+	mvencode AFP, mv(99)
+	tab AFP
 	* considera los valores "99" como faltantes y los elimina
-	mvdecode X, mv(99)
-	* condifica los valores faltantes con el valor "0000"
-	mvencode edad, mv(0000)
+	mvdecode AFP, mv(99)
+
 	
 	
 }
@@ -116,43 +242,7 @@
 	collapse (median) Y (mean) X
 	collapse (mean) X, by(D)
 	
-	///////////////ejemplo practico ///////////
-	{
-			*2017
-			import spss using "c:\...\name_17.sav", clear
-			keep folio x y D factor
-			ren x name_x_17
-			save data_17, replace
-			collapse (mean) name_x_17, by(D)
-			save x17, replace
-
-
-			*2018
-			import spss using "c:\...\name_18.sav", clear
-			keep folio x y D factor
-			ren x name_x_18
-			save data_18, replace
-			collapse (mean) name_x_18, by(D)
-			save x18, replace
-
-
-			*2019
-			import spss using "c:\...\name_19.sav", clear
-			keep folio x y D factor
-			ren x name_x_19
-			save data_19, replace
-			collapse (mean) name_x_19, by(D)
-			save x19, replace
-
-
-			*Unir Bases de datos
-			use x17.dta, clear 
-			merge 1:1 D using x18.dta
-			drop _merge
-			merge 1:1 depto using x19.dta
-			drop _merge
-
-	}
+	
 	}
 	
 	*3.11 BORRAR DUPLICADOS, FORZARLO
@@ -179,5 +269,7 @@
 		drop if edad >70	 //borra observaciones si tienen más de 70 años
 		drop if ylab <50	///borra observaciones si tienen un ingreso menor a 50
 	}	
+	
+	
 	
 	
