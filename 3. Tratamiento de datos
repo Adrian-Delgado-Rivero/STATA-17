@@ -270,6 +270,9 @@
 		drop if ylab <50	///borra observaciones si tienen un ingreso menor a 50
 	}	
 	
-	
-	
+	*3.14 OTRAS FUNCIONES
+	describe // permite ver nombre, tipo, formato, etiquetas de las variables
+	list // muestra una tabla de las caracterisyicas de cada item - individuo
+	codebook // muestra las principales caracteristicas de las variables
+		
 	
