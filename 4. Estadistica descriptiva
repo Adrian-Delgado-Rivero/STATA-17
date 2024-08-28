@@ -1,22 +1,86 @@
+////////////////////////////////////////////////// ///////////////////////////////
+// PROYECTO: ESTADISTICA DESCRIPTIVA
+// AUTOR: ADRIAN ALEJANDRO DELGADO RIVERO
+// BASE DE DATOS: -
+// FUENTE: -
+// VARIABLES: -
+// CONTACTO: draadrian3082000@gmail.com	
+// CONTACTO: +591 69539797
+// PAIS: Bolivia
+////////////////////////////////////////////////// ///////////////////////////////
 
+
+*1. PREVIO  
+	* Memoria
+		set mem 300m // Aumenta la memoria del sistema a 300 megas
+	* Directorio
+		cd "C:\Users\Usuario\Documents\Bases de datos\EJEMPLO"	
+	* Archivo de registro
+		* log using name.log, replace 
+		* log close // off on 
+		
+*2. DATOS.
+
+	*2.1. IMPORTAMOS BASES DE DATOS
+	import spss "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2022\EH2022_Persona", clear // abrimos la EH_2022, seccion 
+	
+
+*3. TRATAMIENTO DE DATOS
+
+*3.1. MANTENER VARIABLES
+{
+	keep folio /// id
+		area ///
+		aestudio /// escolaridad
+		s01a_03 /// edad
+		cobersalud /// tiene seguro medico
+		s04f_35 /// afiliado a AFP
+		depto	/// departamento
+		ylab	/// ingresos laboral
+		ynolab	/// ingreso no laboral
+		s01a_02 /// Sexo
+		phrs	/// hrs laborales semana
+		factor
+		}		
+*3.2 RENOMBRAR
+{
+	rename (aestudio 		s01a_03   	s01a_02 	phrs) ///
+			(escolaridad 	edad   		sexo		hrs_sem) 
+}
+*3.3. GENERAR VARIABLES
+{
+		generate exper = ((edad-6)-escolaridad) // ejemplo para experiencia
+			replace expe=0 if edad<0		// remplazamos experiencia nula si no tienen edad
+			label variable expe "Experiencia laboral en años" //colocamos etiquetas
+		
+		generate mujer= sexo ==2 
+
+		generate empleado =1 if ylab!=0 // creamos la variable "empleado" si 
+			replace empleado=0 if ylab ==0
+			replace empleado=. if ylab==.
+		
+		generate seg= cobersalud==1  // ejemplo para una dicotomica
+			replace seg=0 if cobersalud==2 // remplazamos para valores del caso
+			replace seg=. if cobersalud==. // remplazamos para valores faltante
+
+		generate AFP= s04f_35 ==1  // ejemplo para una dicotomica
+			replace AFP=0 if s04f_35 ==2
+			replace AFP=. if s04f_35 ==.
+			
+		generate  informalidad =1  if AFP==0 | seg==0  // ejemplo para una variable con condicion logica
+			replace  informalidad  =0  if AFP==1 | seg==1 
+}
 *4. ESTADISTICA DESCRIPTIVA
 
-{
 	* TABLAS
 	
 {
-		//Tabla de frecuencias
-		tab X
+		*4.1. TAB. Tabla de frecuencias
+		tab depto
+	
 		
-		// comparacion de proporciones
+		*4.2 TAB2. tablas cruzadas
 		
-		sysuse cancer
-		tab drug died, row
-		tab drug died, expected
-		tab drug died, chi2 row 
-		tab drug died, exact row 
-		
-		*EJEMPLO
 		tab2 area  informal, cell chi2 exact column expected row
 		tab2 area  informal 			//frecuencia observada
 		tab2 area  informal, cell 		//porcentaje total
@@ -26,27 +90,60 @@
 		tab2 area  informal, chi2 		// chi2 : asociacion
 		tab2 area  informal, exact 		//  Fisher's Exact: asociacion
 
-		****TABLA PERSONALIZADA*****
+		*4.3. ****TABLA PERSONALIZADA*****
 		
 		table ( fila ) ( columna ), statistic(commando  X)	
 		
-		*ejemplo
+		*EJEMPLO
 		table ( depto ) ( area ), statistic(mean  escolaridad)	
-		table ( depto ) ( area ) ( mujer ), statistic(mean  escolaridad) statistic(mean  exper)// segmentado para mujer, para las estadisticas de escolaridad y exper
+		table ( depto ) ( area ) ( mujer ), statistic(mean  escolaridad) statistic(mean  exper) // segmentado para mujer, para las estadisticas de escolaridad y exper
 		
 		
 		}
 
-	* TENDENCIA CENTRAL
+	*4.4 TENDENCIA CENTRAL
 {
-	
+	*CODEBOOK
+	*Descripcion general de las variables
+		codebook ylab sexo escolaridad edad area hrs_sem 
 		codebook ylab sexo escolaridad edad area hrs_sem if empleado==1
-		sum ylab edad escolaridad hrs_sem if empleado==1
+	*SUMMARIZE
+	summarize [varlist] [if] [in] [weight] [, options]
+	
+	*Sumario estadistico, con las medidas más relevantes
+	sum ylab edad escolaridad hrs_sem 
+	*Condicional
+	sum ylab edad escolaridad hrs_sem if empleado==1
+	*Ponderado
+	sum ylab edad escolaridad hrs_sem [aweight=area] // ponderado por area
+	**NOTA: la ponderacion es pemite corregir desequilibrios
+	*En Rango
+	sum ylab edad escolaridad hrs_sem  in 5000/l // desde la obs 5000 hasta el final
+	sum ylab edad escolaridad hrs_sem  in f/1000 // desde la obs 1 hatas la 1000 
+	sum ylab edad escolaridad hrs_sem  in 1000/5000 // en el rango de obs 1000 a 5000
+	*Por valores de D
+	by depto, sort: sum ylab edad escolaridad hrs_sem
+	
+	
+	*TABSATAT. Tablas con estadisticos (Tendencia central)
+	tabstat varlist [if] [in] [weight] [, options]
+	
+  *  Options
+  *    labelwidth(#)               width for by() variable labels; default is
+  *                                 labelwidth(16)
+  *    varwidth(#)                 variable width; default is varwidth(12)
+  *    columns(variables)          display variables in table columns; the default
+  *    columns(statistics)         display statistics in table columns
+  *    format[(%fmt)]              display format for statistics; default format is %9.0g
+  *    casewise                    perform casewise deletion of observations
+  *    nototal                     do not report overall statistics; use with by()
+  *    missing                     report statistics for missing values of by() variable
+  *    noseparator                 do not use separator line between by() categories
+  *    longstub                    make left table stub wider
+  *    save                        store summary statistics in r()
 
-			
-		
-		tabstat escolaridad, statistics( mean count  sum max min  median  p1 p10 p25 p50 p75 p90 p99) by(depto)
-		
+	
+	tabstat escolaridad, statistics( mean count  sum max min  median  p1 p10 p25 p50 p75 p90 p99) by(depto)
 				mean // promedio
 				count // conteo no vacio
 				sum // suma * ojo fuera de la tabla dara sumario
@@ -55,13 +152,14 @@
 				median// mediana
 				p90 // percentil 90
 				p25 // percentil 25
-		
+	
+
+
 		* Con restricciones
 		tabstat escolaridad if depto ==1, statistics( mean count  sum max min ) by (area)
 		
 		* Ponderado por el factor de expansión
 		sum yprilab edad escolaridad [w=factor]if area==1 & mujer==1
-
 
 	
 		*Media
@@ -84,8 +182,9 @@
 		
 }	
 	
-	* VARIABILIDAD
-	
+	* 4.5. VARIABILIDAD
+	*TABSATAT. Tablas con estadisticos (variabilidad)	
+
 	{
 		
 
@@ -103,7 +202,9 @@
 		
 	}
 	
-	* CORRELACION
+	
+	
+	*4.6 CORRELACION
 	
 	{
 	corr X1 X2
@@ -113,9 +214,26 @@
 	
 	}
 	
-	* INDICES
-
+	*4.7.  INDICES
+	ratio [name:] varname [/] varname
 	{
-		 ratio (mmm: yprilab/escolaridad), fvwrap(1)
+		 ratio (ejemplo: ylab/escolaridad), fvwrap(1)
 	}
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
