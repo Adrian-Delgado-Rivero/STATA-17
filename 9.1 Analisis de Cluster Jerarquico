@@ -1,1 +1,79 @@
+////////////////////////////////////////////////// ///////////////////////////////
+// PROYECTO: CONCENTRACION DE BICICLETERIAS, ANALISIS CLUSTER Y MODELO DE HOTELLING
+// AUTOR: ADRIAN ALEJANDRO DELGADO RIVERO
+// BASE DE DATOS: Precios y ubicaciones_clasificado.csv
+// FUENTE: Propia
+// VARIABLES: PRECIO, lon, lat
+// CONTACTO: draadrian3082000@gmail.com	
+// CONTACTO: +591 69539797
+// PAIS: Bolivia
+////////////////////////////////////////////////// ///////////////////////////////
+
+
+
+
+*1. IMPORTAR BASE DE DATOS
+ import delimited "C:\Users\Usuario\Documents\INVESTIGACIONES\HOTELLING, BICICLETAS\Precios y ubicaciones_clasificado.csv", clear
+
+ 
+*2. CLASIFICAR 
+
+ ***CLASIFICACION GRUPO 1 (UBICACION)
+ 
+ /////////// METODO: WARD, DISTANCIA: EUCLIDEA AL CUADRADO 		///////////
+ cluster wardslinkage lon lat, measure(L2squared) name(Grupos_v1) generate(_v)
+ 
+ /////////// INDICE PARA DETERMINAR EL NUMERO DE CLUSTERS OPTIMO ///////////
+ cluster stop Grupos_v1, rule(duda) // metodo duda para cluster jerarquicos, Escojer Je(2)/Je(1) menor
+  *cluster stop cluster, rule(calinski) // metodo calinski para cluster no jerarquicos, escoger el valor más grande
+ /////////// GERARAR LAS CLASIFICACIONES ///////////			///////////
+ cluster generate grupos_ubicacion =groups(4), name(Grupos_v1) 
+
+ 
+ ***CLASIFICACION GRUPO 2 (PRECIOS)
+
+  cluster wardslinkage PRECIO,measure(L2squared) name(Grupos_v2) generate(_w)
+  cluster stop Grupos_v2, rule(duda) // metodo duda para cluster jerarquicos
+ cluster generate grupos_precios =groups(2), name(Grupos_v2) 
+
+ 
+ ***DENDOGRAMA VERICAL (UBICACIONES)
+ cluster dendrogram Grupos_v1, ///
+		labels(ID) xlabel(, angle(90) labsize(*.75)) ///
+		ytitle("SIMILITUD") xtitle("BICICLETERIAS") ///
+		title("DENDOGRAMA RESPECTO A UBICACIONES") subtitle("COCHABAMBA, 2024") ///
+		note(	///
+		"Nota 1: Metodo de clasificacion: Ward" /// 
+		"Nota 2: Medida de distancias: Euclidea al cuadrado") /// 
+		xsize(4) ysize(3) //utnumber(##) para ver un numero ## de grupos
+
+
+ ***DENDOGRAMA VERICAL (PRECIOS)
+ cluster dendrogram Grupos_v2, ///
+		labels(ID) xlabel(, angle(90) labsize(*.75)) ///
+		ytitle("SIMILITUD") xtitle("BICICLETERIAS") ///
+		title("DENDOGRAMA RESPECTO A PRECIOS") subtitle("COCHABAMBA, 2024") ///
+		note(	///
+		"Nota 1: Metodo de clasificacion: Ward" /// 
+		"Nota 2: Medida de distancias: Euclidea al cuadrado") /// 
+		xsize(4) ysize(3) //utnumber(##) para ver un numero ## de grupos
+				
+		
+*3. PRUEBA DE NORMALIDAD (VARIABLES)		
+sktest PRECIO lon lat
+
+*4. COMPARACION DE MEDIANAS (POR CLUSTERS)
+median PRECIO, by(grupos_precios)
+median PRECIO, by(grupos_ubicacion) exact medianties(below) 
+  
+*5. COEF. DE CONCENTRACION (RECIPROCO)
+tab2 grupos_ubicacion grupos_precios// FRECUENCIAS
+
+*calcular 1/n
+egen freq_grp = count(grupos_ubicacion), by(grupos_ubicacion)
+gen reciproco_ = 1 / freq_grp
+
+*** Observamos 
+tab2 reciproco_ grupos_precios, row
+
 
