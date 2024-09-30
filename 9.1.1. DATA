@@ -1,0 +1,589 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "2A",
+        "PRECIO": 70,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.19755229802912,
+          -17.396842217133766
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "3A",
+        "PRECIO": 100,
+        "marker-color": "#ff0000",
+        "marker-size": "medium",
+        "marker-symbol": "circle",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.18824453030312,
+          -17.396423148509726
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "4A",
+        "PRECIO": 100,
+        "marker-color": "#ff0000",
+        "marker-size": "medium",
+        "marker-symbol": "circle",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.18259002439694,
+          -17.39638697509359
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "5A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.19879882622159,
+          -17.392369125973133
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "6A",
+        "PRECIO": 100,
+        "marker-color": "#ff0000",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.15271347795581,
+          -17.382525976014875
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "7A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.15364530572452,
+          -17.40956758241697
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "8A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO",
+        "marker-symbol": ""
+      },
+      "geometry": {
+        "coordinates": [
+          -66.15360394894859,
+          -17.408282672990367
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "9A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.15356101486778,
+          -17.407487903982457
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "10A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.15355772173237,
+          -17.407377546916862
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "11A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.1535223596972,
+          -17.406768888804336
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "12A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.15351419932603,
+          -17.406638462091877
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "13A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.15350819447826,
+          -17.406475382952976
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "14A",
+        "PRECIO": 90,
+        "marker-color": "#ff0000",
+        "marker-size": "medium",
+        "marker-symbol": "circle",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.15350105415365,
+          -17.406315755960875
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "15A",
+        "PRECIO": 120,
+        "marker-color": "#ff0000",
+        "marker-size": "medium",
+        "marker-symbol": "circle",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.15350105415365,
+          -17.406240809093475
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "20A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.17725827597461,
+          -17.364973939541684
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "21A",
+        "PRECIO": 100,
+        "marker-color": "#ff0000",
+        "marker-size": "medium",
+        "marker-symbol": "circle",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.1585879048643,
+          -17.364953061239703
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "22A",
+        "PRECIO": 120,
+        "marker-color": "#ff0000",
+        "marker-size": "medium",
+        "marker-symbol": "circle",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.1900867356894,
+          -17.37089582555258
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "23A",
+        "PRECIO": 100,
+        "marker-color": "#ff0000",
+        "marker-size": "medium",
+        "marker-symbol": "circle",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.17931006947622,
+          -17.378124299153185
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "25A",
+        "PRECIO": 120,
+        "marker-color": "#ff0000",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.16034248358787,
+          -17.37942773568858
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "26A",
+        "PRECIO": 120,
+        "marker-color": "#ff0000",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.1614557404859,
+          -17.37747188066362
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "24A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.14361796247002,
+          -17.399137121610465
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "27A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "marker-size": "medium",
+        "marker-symbol": "circle",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.14015130269094,
+          -17.397582224414094
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "SE",
+        "TIPO": "AREA",
+        "PRECIO": ""
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -66.1400902785448,
+              -17.396076476970222
+            ],
+            [
+              -66.15653838322767,
+              -17.406107020188998
+            ],
+            [
+              -66.15508773627475,
+              -17.41126050349436
+            ],
+            [
+              -66.13884049040051,
+              -17.398632081626147
+            ],
+            [
+              -66.1400902785448,
+              -17.396076476970222
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "TIPO": "AREA",
+        "ID": "N"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -66.15116718668877,
+              -17.38385105578358
+            ],
+            [
+              -66.15830863436888,
+              -17.362818143395273
+            ],
+            [
+              -66.16713042267949,
+              -17.37755993933409
+            ],
+            [
+              -66.15116718668877,
+              -17.38385105578358
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "TIPO": "AREA",
+        "ID": "NO"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -66.17417104963373,
+              -17.362966120310134
+            ],
+            [
+              -66.19104674277744,
+              -17.362484668644285
+            ],
+            [
+              -66.19242247863194,
+              -17.376008602212707
+            ],
+            [
+              -66.17618879555351,
+              -17.38034130173257
+            ],
+            [
+              -66.17417104963373,
+              -17.362966120310134
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "TIPO": "AREA",
+        "ID": "OE"
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              -66.21293833892406,
+              -17.3904698860091
+            ],
+            [
+              -66.21236121918774,
+              -17.39732915605522
+            ],
+            [
+              -66.1804089839398,
+              -17.396928587648503
+            ],
+            [
+              -66.17998925517827,
+              -17.391270969906756
+            ],
+            [
+              -66.21293833892406,
+              -17.3904698860091
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "id": 25
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "1A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.20996623399425,
+          -17.396983590537076
+        ],
+        "type": "Point"
+      },
+      "id": 26
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "16A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.17767982132766,
+          -17.364595027500272
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "17A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.1775681986462,
+          -17.36463494199384
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "18A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.17749269707606,
+          -17.364658940925835
+        ],
+        "type": "Point"
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "ID": "19A",
+        "PRECIO": 80,
+        "marker-color": "#00eeff",
+        "TIPO": "PUNTO"
+      },
+      "geometry": {
+        "coordinates": [
+          -66.17740077624434,
+          -17.36468914427502
+        ],
+        "type": "Point"
+      }
+    }
+  ]
+}
