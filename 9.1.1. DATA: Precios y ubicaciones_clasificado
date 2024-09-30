@@ -1,4 +1,20 @@
 {
+ "PROYECTO" : "CONCENTRACION DE BICICLETERIAS, ANALISIS CLUSTER Y MODELO DE HOTELLING",
+ "AUTOR": "ADRIAN ALEJANDRO DELGADO RIVERO",
+ "BASE DE DATOS": "Precios y ubicaciones_clasificado",
+ "FUENTE": "Propia",
+ "VARIABLES": "PRECIO, lon, lat",
+ "CONTACTO": "draadrian3082000@gmail.com",
+ "CONTACTO": "+591 69539797",
+ "PAIS": "Bolivia",
+ "NOTA 1": "Para exporar al software, necesitas converir este GEOJSON a CSV, por lo que puedes ingresar al siguiente link: https://geojson.io/ cargar el archivo y descargarlo en CSV",
+ "NOTA 2" : "Es necesario borrar estos comentarios al momento de realizarlo", 
+}
+
+
+
+
+{
   "type": "FeatureCollection",
   "features": [
     {
