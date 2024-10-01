@@ -1,1 +1,46 @@
+*1. IMPORTAR BASE DE DATOS
+ import spss using "C:\Users\Usuario\Documents\INVESTIGACIONES\HOTELLING, BICICLETAS\Data_clasificada_.sav", clear
 
+ 
+ 
+*2. CLASIFICAR 
+
+ ***CLASIFICACION GRUPO 1 (D1)
+ 
+ /////////// METODO: WARD, DISTANCIA: EUCLIDEA AL CUADRADO 		///////////
+ cluster X1 X2 X3 X4 X5, measure(L2squared) name(Grupos_v1) generate(_v)
+ 
+ /////////// INDICE PARA DETERMINAR EL NUMERO DE CLUSTERS OPTIMO ///////////
+ cluster stop Grupos_v1, rule(duda) // metodo duda para cluster jerarquicos, Escojer Je(2)/Je(1) menor
+  *cluster stop cluster, rule(calinski) // metodo calinski para cluster no jerarquicos, escoger el valor más grande
+ /////////// GERARAR LAS CLASIFICACIONES ///////////			///////////
+ cluster generate grupos_ubicacion =groups(4), name(Grupos_v1) 
+
+ 
+ 
+ ***DENDOGRAMA VERICAL
+ cluster dendrogram Grupos_v2, ///
+		labels(ID) xlabel(, angle(90) labsize(*.75)) ///
+		ytitle("SIMILITUD") xtitle("BICICLETERIAS") ///
+		title("DENDOGRAMA RESPECTO A PRECIOS") subtitle("COCHABAMBA, 2024") ///
+		caption("leyenda")  ///
+		note(	///
+		"Nota 1: Metodo de clasificacion: Ward" /// 
+		"Nota 2: Medida de distancias: Euclidea al cuadrado") /// 
+		xsize(4) ysize(3) //utnumber(##) para ver un numero ## de grupos
+
+		
+		
+
+		 
+***DENDOGRAMA HORIZONTAL		
+cluster dendrogram _clus_1, ///
+		labels(ID)  ylabel(, angle(0) labsize(*.75)) horizontal ///
+		ytitle(Y) xtitle(X) ///
+		title(TITULO) subtitle(CZCZ) ///
+		caption("leyenda")  ///
+		note(METODO DE WARD) /// 
+		xsize(4) ysize(3)
+
+		
+		
