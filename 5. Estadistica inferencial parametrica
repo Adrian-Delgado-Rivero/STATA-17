@@ -1,16 +1,123 @@
-*5. ESTADISTICA INFERENCIAL PARAMETRICO
+////////////////////////////////////////////////// ///////////////////////////////
+// PROYECTO: ESTADISTICA INFERENCIAL PARAMETRICA
+// AUTOR: ADRIAN ALEJANDRO DELGADO RIVERO
+// BASE DE DATOS: -
+// FUENTE: -
+// VARIABLES: -
+// CONTACTO: draadrian3082000@gmail.com	
+// CONTACTO: +591 69539797
+// PAIS: Bolivia
+////////////////////////////////////////////////// ///////////////////////////////
+
+
+
+*1. PREVIO  
+	* Memoria
+		set mem 300m // Aumenta la memoria del sistema a 300 megas
+	* Directorio
+		cd "C:\Users\Usuario\Documents\Bases de datos\EJEMPLO"	
+	* Archivo de registro
+		* log using name.log, replace 
+		* log close // off on 
+		
+*2. DATOS.
+
+	*2.1. IMPORTAMOS BASES DE DATOS
+	import spss "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2022\EH2022_Persona", clear // abrimos la EH_2022, seccion 
+	
+
+*3. TRATAMIENTO DE DATOS
+
+*3.1. MANTENER VARIABLES
+{
+	keep folio /// id
+		area ///
+		aestudio /// escolaridad
+		s01a_03 /// edad
+		cobersalud /// tiene seguro medico
+		s04f_35 /// afiliado a AFP
+		depto	/// departamento
+		ylab	/// ingresos laboral
+		ynolab	/// ingreso no laboral
+		s01a_02 /// Sexo
+		phrs	/// hrs laborales semana
+		factor
+		}		
+*3.2 RENOMBRAR
+{
+	rename (aestudio 		s01a_03   	s01a_02 	phrs) ///
+			(escolaridad 	edad   		sexo		hrs_sem) 
+}
+*3.3. GENERAR VARIABLES
+{
+		generate exper = ((edad-6)-escolaridad) // ejemplo para experiencia
+			replace expe=0 if edad<0		// remplazamos experiencia nula si no tienen edad
+			label variable expe "Experiencia laboral en años" //colocamos etiquetas
+		
+		generate mujer= sexo ==2 
+
+		generate empleado =1 if ylab!=0 // creamos la variable "empleado" si 
+			replace empleado=0 if ylab ==0
+			replace empleado=. if ylab==.
+		
+		generate seg= cobersalud==1  // ejemplo para una dicotomica
+			replace seg=0 if cobersalud==2 // remplazamos para valores del caso
+			replace seg=. if cobersalud==. // remplazamos para valores faltante
+
+		generate AFP= s04f_35 ==1  // ejemplo para una dicotomica
+			replace AFP=0 if s04f_35 ==2
+			replace AFP=. if s04f_35 ==.
+			
+		generate  informalidad =1  if AFP==0 | seg==0  // ejemplo para una variable con condicion logica
+			replace  informalidad  =0  if AFP==1 | seg==1 
+
+		
+		gen ytotal = ylab + ynolab // Ingreso total
+		gen p_ylab = ylab/ytotal // proporcion del ingreso laboral
+		gen p_ynolab = ynolab/ytotal // proporcion del ingreso no laboral
+	
+			
+}
+			
+			
+*. ESTADISTICA INFERENCIAL PARAMETRICO
 
 {
 	* MEDIAS
 	
-	{
-		ttest X, by(D) //diferencia de medias
-		ttest X==5000	
-		ttest X==10000 if D_ ==1
 	
-		prtest X, by(D) //diferencia de proporcion
-		prtest X==0.9	
+	
+	{
+
+* MEDIAS CON VARIANZA CONOCIDA
+		ztest ylab == 500
+		ztest ylab, by(sexo) sd(1000)
+		ztest ylab, by(sexo) sd1(858.274) sd2(2490.25)
+		ztest ylab == ylab, unpaired sd1(858.274) sd2(2490.25)
+		
+		
+		
+*MEDIAS	CON VARIANZA DESCONOCIDA
+		ttest ylab == 599, level(99.9)
+		ttest ylab, by(sexo) unequal // varianza desigual
+		ttest ylab == ynolab, unpaired unequal // variables
+	
+	
+		ttest ylab, by(informalidad) //diferencia de medias
+		ttest ylab==2000	
+		ttest ylab==2000 if sexo==1
+	
+*PROPORCION
+		prtest x, by(informalidad) //diferencia de proporcion
+		prtest p_ylab==0.9	
 		prtest X ==0.9 if D_==1
+		
+*VARIANZA
+		sdtest ylab == 1000
+		sdtest ylab, by(sexo)
+		sdtest ylab == ynolab
+		
+		robvar ylab, by(depto)
 		
 		
 		// intervalo de confianza
@@ -18,13 +125,26 @@
 		*		display 6165+(1.96*3.4287195)
 		*		ci mean price
 
+
+
+		/// ingresos laboral
+		/// ingreso no laboral
+		
+	
+	
 	}
 	
-	* VARINZA
+	* ANOVA
 	
 	{	
+		oneway ylab depto
 		loneway escolaridad depto
+	
+	
 	}
 	
 	* NORMALIDAD
-}
+
+	
+	
+	}
