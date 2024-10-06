@@ -75,7 +75,8 @@
 		gen ytotal = ylab + ynolab // Ingreso total
 		gen p_ylab = ylab/ytotal // proporcion del ingreso laboral
 		gen p_ynolab = ynolab/ytotal // proporcion del ingreso no laboral
-	
+		gen p_ytotal = ytotal/ytotal // proporcion del ingreso no laboral
+
 			
 }
 			
@@ -83,53 +84,62 @@
 *. ESTADISTICA INFERENCIAL PARAMETRICO
 
 {
-	* MEDIAS
-	
-	
+	*COMPARACION DE MEDIAS
 	
 	{
 
-* MEDIAS CON VARIANZA CONOCIDA
-		ztest ylab == 500
-		ztest ylab, by(sexo) sd(1000)
-		ztest ylab, by(sexo) sd1(858.274) sd2(2490.25)
-		ztest ylab == ylab, unpaired sd1(858.274) sd2(2490.25)
+*PRUEBA Z, COMPARACION DE MEDIAS CON VARIANZA CONOCIDA
+		ztest ylab == 500										// UN VALOR EXACTO (95% DE CONFIANZA)
+		ztest ylab == 500, level(99.9)							// UN VALOR EXACTO (99.9% DE CONFIANZA)
+		ztest ylab, by(sexo) sd(1000)							// vARIANZA COMUN ENTRE GRUPOS
+		ztest ylab, by(sexo) sd1(858.274) sd2(2490.25)			// vARIANZA DIFERENTE ENTRE GRUPOS
+		ztest ylab == ylab, unpaired sd1(858.274) sd2(2490.25)	// vARIANZA DIFERENTE ENTRE VARIABLES
+		ztest ylab == ynolab, unpaired sd(858.274)				// vARIANZA DIFERENTE ENTRE VARIABLES
 		
 		
 		
-*MEDIAS	CON VARIANZA DESCONOCIDA
-		ttest ylab == 599, level(99.9)
-		ttest ylab, by(sexo) unequal // varianza desigual
-		ttest ylab == ynolab, unpaired unequal // variables
+*PRUEBA T, COMPARACION DE MEDIAS	CON VARIANZA DESCONOCIDA
+		ttest ylab == 599, level(99.9)							//VALOR EXACTO (99.9% DE CONFIANZA)
+		ttest ylab, by(sexo) unequal 							// VARIANZA DESCONOCIDA ENTRE GRUPOS
+		ttest ylab == ynolab, unpaired unequal 					// VARIANZA DESCONOCIDA ENTRE VARIABLES
+		ttest ylab, by(informalidad) 							//DIFERENCIA DE MEDIAS****
+		ttest ylab==2000										//VALOR EXACTO (95% DE CONFIANZA)
+		ttest ylab==2000 if sexo==1								// VALOR EXACTO PARA UN GRUPO
 	
-	
-		ttest ylab, by(informalidad) //diferencia de medias
-		ttest ylab==2000	
-		ttest ylab==2000 if sexo==1
-	
-*PROPORCION
-		prtest x, by(informalidad) //diferencia de proporcion
-		prtest p_ylab==0.9	
-		prtest X ==0.9 if D_==1
+*PRUEBA T, COMPARACION, COMPARACION DE PROPORPROPORCIONES PROPORCION
+	*(si usas prtest, solo servira para variables con valores de 0 o 1)
+		ttest p_ylab, by(informalidad) 
+		ttest p_ylab==0.9	
+		ttest p_ylab==0.9 if informalidad==1
+		ttest p_ylab==p_ynolab	
 		
-*VARIANZA
-		sdtest ylab == 1000
+		prtest informalidad, by (sexo) // DIFERENCIA DE PROPORPROPORCIONES
+		
+*PRUEBA DE COMPARACION DE VARIANZAS
+		sdtest ylab == 2490
 		sdtest ylab, by(sexo)
 		sdtest ylab == ynolab
-		
+	
+	
+	
 		robvar ylab, by(depto)
 		
-		
-		// intervalo de confianza
-		*		display 2949.496/sqrt(74)
-		*		display 6165+(1.96*3.4287195)
-		*		ci mean price
+*La prueba básica de igualdad de varianzas tradicional es la prueba de Bartlett, que es muy sensible a la no normalidad de los datos. El comando robvar utiliza versiones robustas de esta prueba, como la prueba de Brown-Forsythe, para lidiar con posibles problemas de heterocedasticidad y no normalidad. Estas pruebas robustas permiten determinar si las varianzas de los grupos son homogéneas sin asumir que los datos sigan una distribución normal.
 
+*El comando te devuelve tres estadísticos de prueba (W0, W50, W10), que son ajustes de la prueba F, pero con modificaciones para hacerla robusta a diferentes tipos de varianzas o distribuciones
 
+*Estadísticos de prueba en robvar:
+*W0 (Prueba F de Brown-Forsythe modificada):
 
-		/// ingresos laboral
-		/// ingreso no laboral
-		
+*Es un ajuste robusto de la prueba F clásica para igualdad de varianzas, que corrige la heterocedasticidad.
+
+*Esta prueba se basa en la mediana de los datos dentro de cada grupo, en lugar de la media (como en la prueba F tradicional), lo que la hace menos sensible a los valores extremos o distribuciones no normales.
+*W50 y W10:
+
+*Estas son otras versiones robustas de la prueba F, que ajustan la robustez al 50% y 10%, respectivamente.
+
+*W50 es moderadamente robusta (para distribuciones levemente no normales), mientras que W10 es más robusta a distribuciones altamente no normales o con muchos valores atípicos.
+
 	
 	
 	}
@@ -137,14 +147,37 @@
 	* ANOVA
 	
 	{	
+		
+*ANOVA: Compara las medias de una sola variable dependiente continua entre diferentes niveles de una o más variables categóricas (factores).
+
+*MANOVA: Compara las medias de dos o más variables dependientes continuas simultáneamente entre diferentes niveles de una o más variables categóricas, teniendo en cuenta las relaciones entre estas variables dependientes.		
+
+
+		*ASUME VARIANZAS IGUALES
 		oneway ylab depto
+		
+		*ASUME VARIANZAS DESIGUALES
 		loneway escolaridad depto
 	
 	
 	}
 	
 	* NORMALIDAD
+			*(p<0.05) no sigue una distribución normal
 
-	
-	
+*Comando			Prueba					Mejor para...						Nivel de muestra recomendado
+*swilk			Shapiro-Wilk			Muestras pequeñas/medianas			Pequeñas a medianas
+*sktest			Jarque-Bera				Detectar asimetría y curtosis		Muestras grandes
+*sfrancia		Shapiro-Francia			Alternativa a Shapiro-Wilk			Muestras grandes
+*qnorm			Gráfico Q-Q				Visualización						General
+*hist			Histograma con curva	Visualización						General
+
+	swilk ylab
+	sktest ylab
+	sfrancia ylab
+	qnorm ylab
+	hist ylab
+
+
+
 	}
