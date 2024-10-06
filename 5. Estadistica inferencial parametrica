@@ -81,10 +81,10 @@
 }
 			
 			
-*. ESTADISTICA INFERENCIAL PARAMETRICO
+*4. ESTADISTICA INFERENCIAL PARAMETRICA
 
 {
-	*COMPARACION DE MEDIAS
+	*4.1 COMPARACION DE MEDIAS
 	
 	{
 
@@ -115,7 +115,7 @@
 		
 		prtest informalidad, by (sexo) // DIFERENCIA DE PROPORPROPORCIONES
 		
-*PRUEBA DE COMPARACION DE VARIANZAS
+	*4.2. PRUEBA DE COMPARACION DE VARIANZAS
 		sdtest ylab == 2490
 		sdtest ylab, by(sexo)
 		sdtest ylab == ynolab
@@ -144,7 +144,7 @@
 	
 	}
 	
-	* ANOVA
+	*4.3 ANOVA
 	
 	{	
 		
@@ -162,7 +162,7 @@
 	
 	}
 	
-	* NORMALIDAD
+	* 4.4. NORMALIDAD
 			*(p<0.05) no sigue una distribución normal
 
 *Comando			Prueba					Mejor para...						Nivel de muestra recomendado
