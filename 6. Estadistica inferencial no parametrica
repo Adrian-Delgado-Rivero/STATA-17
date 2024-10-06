@@ -1,27 +1,121 @@
-*6. ESTADISTICA INFERENCIAL NO PARAMETRICO
+////////////////////////////////////////////////// ///////////////////////////////
+// PROYECTO: ESTADISTICA INFERENCIAL NO PARAMETRICA
+// AUTOR: ADRIAN ALEJANDRO DELGADO RIVERO
+// BASE DE DATOS: -
+// FUENTE: -
+// VARIABLES: -
+// CONTACTO: draadrian3082000@gmail.com	
+// CONTACTO: +591 69539797
+// PAIS: Bolivia
+////////////////////////////////////////////////// ///////////////////////////////
 
+
+
+
+*1. PREVIO  
+	* Memoria
+		set mem 300m // Aumenta la memoria del sistema a 300 megas
+	* Directorio
+		cd "C:\Users\Usuario\Documents\Bases de datos\EJEMPLO"	
+	* Archivo de registro
+		* log using name.log, replace 
+		* log close // off on 
+		
+*2. DATOS.
+
+	*2.1. IMPORTAMOS BASES DE DATOS
+	import spss "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2022\EH2022_Persona", clear // abrimos la EH_2022, seccion 
+	
+
+*3. TRATAMIENTO DE DATOS
+
+*3.1. MANTENER VARIABLES
 {
-	* MEDIANA
+	keep folio /// id
+		area ///
+		aestudio /// escolaridad
+		s01a_03 /// edad
+		cobersalud /// tiene seguro medico
+		s04f_35 /// afiliado a AFP
+		depto	/// departamento
+		ylab	/// ingresos laboral
+		ynolab	/// ingreso no laboral
+		s01a_02 /// Sexo
+		phrs	/// hrs laborales semana
+		factor
+		}		
+*3.2 RENOMBRAR
+{
+	rename (aestudio 		s01a_03   	s01a_02 	phrs) ///
+			(escolaridad 	edad   		sexo		hrs_sem) 
+}
+*3.3. GENERAR VARIABLES
+{
+		generate exper = ((edad-6)-escolaridad) // ejemplo para experiencia
+			replace expe=0 if edad<0		// remplazamos experiencia nula si no tienen edad
+			label variable expe "Experiencia laboral en años" //colocamos etiquetas
+		
+		generate mujer= sexo ==2 
+
+		generate empleado =1 if ylab!=0 // creamos la variable "empleado" si 
+			replace empleado=0 if ylab ==0
+			replace empleado=. if ylab==.
+		
+		generate seg= cobersalud==1  // ejemplo para una dicotomica
+			replace seg=0 if cobersalud==2 // remplazamos para valores del caso
+			replace seg=. if cobersalud==. // remplazamos para valores faltante
+
+		generate AFP= s04f_35 ==1  // ejemplo para una dicotomica
+			replace AFP=0 if s04f_35 ==2
+			replace AFP=. if s04f_35 ==.
+			
+		generate  informalidad =1  if AFP==0 | seg==0  // ejemplo para una variable con condicion logica
+			replace  informalidad  =0  if AFP==1 | seg==1 
+
+		
+		gen ytotal = ylab + ynolab // Ingreso total
+		gen p_ylab = ylab/ytotal // proporcion del ingreso laboral
+		gen p_ynolab = ynolab/ytotal // proporcion del ingreso no laboral
+		gen p_ytotal = ytotal/ytotal // proporcion del ingreso no laboral
+
+			
+}
+			
+			
+*4. ESTADISTICA INFERENCIAL NO PARAMETRICA
+
+
+	* 4.1. MEDIANA
 
 	{	
-*	median yprilab, by(area)
-*	ranksum yprilab, by(area)
+	*Ho:Las muestras tienen la misma mediana.	
+	median ylab, by(area)
+	*Ho: Las distribuciones de las dos muestras son iguales (incluyendo las medianas).¨
+	ranksum ylab, by(area) //2 grupos
+	*Ho:La mediana de las diferencias es cero.
+	signrank var1 = var2
 	}
 	
-	* VARIANZA
+	*4.2 VARIANZA
 	
 	{
-	 ksmirnov escolaridad = 12
-	 ksmirnov escolaridad, by(area)
+	 
+	*Ho:Las distribuciones (medianas) de los grupos son iguales.
+	kwallis ylab, by(depto) //>2 grupos    | Equivale al ANOVA
+	
+	
 	}
 	
-	* NORMALIDAD
+	*4.3.  NORMALIDAD
 	
 	{
-		sktest price  // si es menor a 0.05 entonces no sigue una distribucion normal
-		sktest price if peso==1
-		sktest price if peso==0
-		swilk price
+		sktest ylab  // si es menor a 0.05 entonces no sigue una distribucion normal
+		sktest ylab if informalidad==1
+		sktest ylab if informalidad==0
+		swilk ylab
+		
+		
+		
 		
 		bysort peso: swilk price
 		histogram price, by(peso) normal
@@ -31,10 +125,35 @@
 
 		
 		by caeb_op, sort :mvtest normality yprilab /// MULTIVARIADA
+	
+	*4.4. CORRELACION
+	spearman edad ynolab escolaridad ylab, stats(rho) star(0.05) pw matrix
+	
+	ktau edad ynolab escolaridad ylab, stats(taua taub) star(0.05) pw matrix
 	}
 	
-	* CHI 2
+	*4.5. CHI 2
 	{
 	tab A B, chi2  
 	}
+	
+	*4.6. DISTRIBUACION
+	
+	
+	
+*Prueba de Kolmogorov-Smirnov de una muestra
+*Compara la distribución empírica de una muestra con una distribución teórica específica (por ejemplo, normal, uniforme, exponencial).
+*Ho:  La muestra proviene de la distribución teórica especificada.
+
+	 ksmirnov escolaridad = normal(escolaridad)
+
+	 
+	 *Prueba de Kolmogorov-Smirnov de dos muestras:
+*Compara las distribuciones empíricas de dos muestras independientes para determinar si provienen de la misma distribución.
+*Ho:Las dos muestras provienen de la misma distribución.
+*P<0.05 Las distribuciones son diferentes
+
+	 ksmirnov escolaridad, by(area)
+
+	
 }
