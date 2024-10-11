@@ -1,0 +1,165 @@
+////////////////////////////////////////////////// ///////////////////////////////
+// PROYECTO: ECONOMETRIA MODELO LINEAL SIMPLE (MLS)
+// AUTOR: ADRIAN ALEJANDRO DELGADO RIVERO
+// BASE DE DATOS: -
+// FUENTE: -
+// VARIABLES: -
+// CONTACTO: draadrian3082000@gmail.com	
+// CONTACTO: +591 69539797
+// PAIS: Bolivia
+////////////////////////////////////////////////// ///////////////////////////////
+
+
+
+*1. PREVIO  
+	* Memoria
+		set mem 300m // Aumenta la memoria del sistema a 300 megas
+	* Directorio
+		cd "C:\Users\Usuario\Documents\Bases de datos\EJEMPLO"	
+	* Archivo de registro
+		* log using name.log, replace 
+		* log close // off on 
+		
+*2. DATOS.
+
+	*2.1. IMPORTAMOS BASES DE DATOS
+	import spss "C:\Users\Usuario\Documents\Bases de datos\EH-SPSS\EH 2022\EH2022_Persona", clear // abrimos la EH_2022, seccion 
+	
+
+*3. TRATAMIENTO DE DATOS
+
+*3.1. MANTENER VARIABLES
+{
+	keep folio /// id
+		area ///
+		aestudio /// escolaridad
+		s01a_03 /// edad
+		cobersalud /// tiene seguro medico
+		s04f_35 /// afiliado a AFP
+		depto	/// departamento
+		ylab	/// ingresos laboral
+		ynolab	/// ingreso no laboral
+		s01a_02 /// Sexo
+		phrs	/// hrs laborales semana
+		factor
+		}		
+*3.2 RENOMBRAR
+{
+	rename (aestudio 		s01a_03   	s01a_02 	phrs) ///
+			(escolaridad 	edad   		sexo		hrs_sem) 
+}
+*3.3. GENERAR VARIABLES
+{
+		generate exper = ((edad-6)-escolaridad) // ejemplo para experiencia
+			replace exper=0 if edad<0		// remplazamos experiencia nula si no tienen edad
+			label variable exper "Experiencia laboral en años" //colocamos etiquetas
+		
+		generate exper2 = exper*exper
+		
+		generate mujer= sexo ==2 
+
+		generate empleado =1 if ylab!=0 // creamos la variable "empleado" si 
+			replace empleado=0 if ylab ==0
+			replace empleado=. if ylab==.
+		
+		generate seg= cobersalud==1  // ejemplo para una dicotomica
+			replace seg=0 if cobersalud==2 // remplazamos para valores del caso
+			replace seg=. if cobersalud==. // remplazamos para valores faltante
+
+		generate AFP= s04f_35 ==1  // ejemplo para una dicotomica
+			replace AFP=0 if s04f_35 ==2
+			replace AFP=. if s04f_35 ==.
+			
+		generate  informalidad =1  if AFP==0 | seg==0  // ejemplo para una variable con condicion logica
+			replace  informalidad  =0  if AFP==1 | seg==1 
+
+			
+}
+
+*4 ECONOMETRIA
+
+*La econometria es un conjunto de tecnicas de estadistica que permite realizar proyecciones ("predecir") y clasificar
+
+*Es necerario cumplir unos supuestos basicos
+
+*[SUPUESTOS DE MCO]
+
+*(1) Homoscedasticidad - No heteroscedasticidad: La varianza de los errores es la misma para todas las observaciones
+*(2) NO multicolinealidad: Las variables independientes no son funcion de otras variables independientes 
+*(3) Normalidad de los resiudos: Los resiudos se distribuyen normalmente
+	* No es necesario, pero si recomendable observar si las variables se distribuyen normalmente	
+*(4) No autocorrelacion: Los errores correspondientes a cada observacion no estan correlacionados entre so
+*(5) Correcta especificación
+*	No variables omitidas: No se omiten variables
+*	Endogeneidad: la forma muncional es correcta	
+
+*[SUPUESTOS GENERALES]
+*(6) Numero de observaciones mayor al número de variables
+
+
+* 4.1. Previo
+*Correlacion
+*Nos permite saber a priori que las variables independientes si tienen relacion con la variable dependientes. Pero tambien identificar antes de tiempo posible multicolinealidad
+	corr ylab escolaridad exper exper2
+
+
+*Normalidad 
+	sktest ylab escolaridad exper exper2 // si es menor a 0.05 entonces no sigue una distribucion normal
+
+	
+*4.2  Regresion Lineal Simple (RLS)
+	*reg Y X 
+	reg ylab escolaridad exper exper2
+
+
+*NOTA: 
+*R2: Porcentaje de ajuste del modelo a los datos
+*R2 ajustado; Porcentaje de ajuste del modelo a los datos, con respecto al numero de variables
+*P>F: Prueba de linealidad conjunta // debe ser menor a 0.05
+*P>t: Prueba de linealidad entre la variable independiente y la dependiente // debe ser menor a 0.05
+*b: Efecto del cambio de una unidad de la variable independiente respecto a la variable dependiente
+
+
+	estat ic //Criterios de informacion : Akaike (AIC) - Bayesian (BIC)
+*CRITERIOS DE INFORMACION: Se debe comparar los resultados entre varios modelos, para seleccionar el modelo más parcimonioso (sencillo)
+*AIC: Minimizar la pérdida de información al seleccionar un modelo. 
+*BIC: Seleccionar el modelo que sea más probable dadas las observaciones y el número de parámetros.
+
+	
+*4.3. PRUEBAS	
+	predict e, residuals
+		
+		** HETEROSCEDASTICIDAD // si es menor a 0.05 entonces tiene heteroscedasticidad
+		imtest, white		//white
+		estat hettest		//Breusch–Pagan
+		** MULTICOLINEALIDAD
+		vif
+		** NORMALIDAD
+		kdensity e, normal
+		sktest e
+		swilk e
+		** VARIABLES OMITIDAS
+		ovtest			// si es menor a 0.05 la funcion esta mal especificada o existen variables omitidas
+		** AUTOCORRELACION
+		estat bgodfrey // solo para variables temporales		
+
+		
+*4.4. CORRECCION DE PROBLEMAS ECONOMETRICOS		
+*Para corregir problemas como heteroscedasticidad o mala especificación se puede realizar una transformacion logaritmica de las variables
+
+
+		generate lnylab = ln(ylab)
+		generate lnescolaridad = ln(escolaridad)
+		generate lnyexper = ln(exper)
+		generate lnyexper2 = ln(exper2)
+
+*Nota 1:Al realizar la transformacion a logaritmos, los errores tienden a tener una distribucion normal
+*Nota 2:Los modelos puden ser de tipo:
+
+*Lin-lin: Lineal - Lineal// Beta se interpreta como el cambio de una unidad Y ante el cambio de una unidad de X
+*Log-Lin: Logaritmico - Lineal// Beta se interpreta como el cambio % Y ante el cambio de una unidad de X
+*Lin-Log: Lineal - Logaritmico// Beta se interpreta como el cambio de una unidad Y ante un cambio % X
+*Log-Log:Logaritmico - Logaritmico// Beta se interpreta como el cambio % Y ante el cambio % de X
+		
+		reg lnylab lnescolaridad lnyexper lnyexper lnyexper2
+		
