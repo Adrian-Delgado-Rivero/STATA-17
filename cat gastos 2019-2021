@@ -43,30 +43,18 @@ gen gasto_alimentos_2019 = s10_10_14 + s10_10_15 + s10_10_16 + s10_10_17 + s10_1
 
 categorias de gasto 2021
 
-* Crear categorías de gastos
-gen gasto_limpieza = s09b_10_01
-gen gasto_transporte = s09b_10_02  + s09b_10_03 
-gen gasto_servicios = s09b_10_04 + s09b_10_05 + s09b_10_06 + s09b_10_07 + s09b_10_08 + s09b_10_09 + s09b_10_10
+*  Crear las nuevas variables de categorías de gasto
+gen gasto_transporte = s09b_10_02 + s09b_10_03
+gen gasto_personales_vestimenta = s09b_11_02 + s09b_11_03 + s09b_11_04 + s09b_11_05
+gen gasto_alimentos_fuera_hogar = s09b_10_14 + s09b_10_15 + s09b_10_16 + s09b_10_17 + s09b_10_18 + s09b_10_19 + s09b_10_20 + s09b_10_21
+gen gasto_tics = s09b_11_08
 gen gasto_educacion = s09b_10_11 + s09b_10_12 + s09b_10_13
+gen gasto_financiero_legal = s09b_13_05 + s09b_13_06 + s09b_13_07
+gen gasto_hogar = s09b_10_04 + s09b_10_05 + s09b_10_06 + s09b_10_07 + s09b_10_08 + s09b_10_09
+gen gasto_servicios_transferencias = s09b_10_22 + s09b_10_23 + s09b_10_24 + s09b_10_25 + s09b_10_26 + s09b_10_27 + s09b_10_28 + s09b_10_29
+gen gasto_articulos_diversos = s09b_13_16 + s09b_13_17 + s09b_13_18 + s09b_13_19
+gen gasto_s_basico = s09b_12_01 + s09b_12_02
 gen gasto_alimentos = s09b_10_14 + s09b_10_15 + s09b_10_16 + s09b_10_17 + s09b_10_18 + s09b_10_19 + s09b_10_20 + s09b_10_21
-gen gasto_otros_mensuales = s09b_10_22  + s09b_10_23 + s09b_10_24 + s09b_10_25 + s09b_10_26 + s09b_10_27 + s09b_10_28 + s09b_10_29
-
-* Gastos trimestrales y ajustarlos a un promedio mensual
-gen gasto_comunicaciones_mensual = s09b_11_01 / 3
-gen gasto_vestido_mensual = (s09b_11_02 + s09b_11_03 + s09b_11_04 + s09b_11_05 + s09b_11_06 + s09b_11_07) / 3
-gen gasto_servicios_hogar_mensual = s09b_11_08 / 3
-
-* Gastos semestrales y ajustarlos a un promedio mensual
-gen gasto_reparacion_mensual = s09b_12_01 + s09b_12_02 / 6
-gen gasto_productos_mensual = s09b_12_03 / 6
-
-* Gastos anuales y ajustarlos a un promedio mensual
-gen gasto_equipamiento_mensual = (s09b_13_01 + s09b_13_02) / 12
-gen gasto_otros_anuales_mensual = (s09b_13_10 + s09b_13_11 + s09b_13_12 + s09b_13_13 + s09b_13_14) / 12
-
-* Total de gasto mensual ajustado
-gen gasto_total_mensual = gasto_limpieza + gasto_transporte + gasto_servicios + gasto_educacion + gasto_alimentos + gasto_otros_mensuales + gasto_comunicaciones_mensual + gasto_vestido_mensual + gasto_servicios_hogar_mensual + gasto_reparacion_mensual + gasto_productos_mensual + gasto_equipamiento_mensual + gasto_otros_anuales_mensual
-
 * Ver resumen de las nuevas variables
 summarize gasto_*
 
