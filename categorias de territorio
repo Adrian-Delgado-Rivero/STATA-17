@@ -1,0 +1,20 @@
+* Crear la variable "territorio"
+gen territorio = .
+replace territorio = 1 if inlist(depto, 2, 3, 7) // Eje metropolitano
+replace territorio = 2 if !inlist(depto, 2, 3, 7) // Interior del país
+label define territorio_lbl 1 "Eje Metropolitano" 2 "Interior del País"
+label values territorio territorio_lbl
+
+* Crear la variable "categoria_territorial"
+gen categoria_territorial = .
+replace categoria_territorial = 1 if area == 1 & territorio == 1 // Urbano Metropolitano
+replace categoria_territorial = 2 if area == 2 & territorio == 1 // Rural Metropolitano
+replace categoria_territorial = 3 if area == 1 & territorio == 2 // Urbano Interior
+replace categoria_territorial = 4 if area == 2 & territorio == 2 // Rural Interior
+label define categoria_lbl 1 "Urbano Metropolitano" 2 "Rural Metropolitano" ///
+                          3 "Urbano Interior" 4 "Rural Interior"
+label values categoria_territorial categoria_lbl
+
+* Verificar los resultados
+tab territorio
+tab categoria_territorial
