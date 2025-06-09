@@ -89,6 +89,7 @@
 		tab2 area  informal, row		//porcentaje fila
 		tab2 area  informal, chi2 		// chi2 : asociacion
 		tab2 area  informal, exact 		//  Fisher's Exact: asociacion
+		tab2 area  informal, nofreq row		// Tablas sin frecuencua y porcentaje fila
 
 		*4.3. ****TABLA PERSONALIZADA*****
 		
